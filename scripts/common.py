@@ -51,12 +51,9 @@ def rules() -> dict:
 
 @cache
 def sections() -> dict[str, dict]:
-    """섹션 id → 섹션 설정."""
-    result = {}
-    for path in sorted((CONFIG_DIR / "sections").glob("*.yaml")):
-        conf = load_yaml(path)
-        result[conf["id"]] = conf
-    return result
+    """섹션 id → 섹션 설정. order 순."""
+    confs = [load_yaml(path) for path in (CONFIG_DIR / "sections").glob("*.yaml")]
+    return {c["id"]: c for c in sorted(confs, key=lambda c: c["order"])}
 
 
 @cache

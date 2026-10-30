@@ -1,0 +1,33 @@
+name: pr-check
+
+# PR마다 형식 검사(상태 체크). 브리핑 PR은 변경 범위와 원문 링크도 본다.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 형식 검사
+        run: python scripts/validate.py
+      - name: 변경 범위 (브리핑 PR)
+        if: startsWith(github.head_ref, 'claude/briefing')
+        run: python scripts/briefing_branch.py check-paths --base origin/${{ github.base_ref }}
+      - name: 원문 링크 (경고만)
+        if: startsWith(github.head_ref, 'claude/briefing')
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/link_check.py --base origin/${{ github.base_ref }} --comment ${{ github.event.pull_request.number }}
