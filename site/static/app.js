@@ -10,6 +10,7 @@
   const DAY_MS = 86400000;
   const LLM_DAYS = 7;
   const URGENT_DAYS = 3;
+  const STALE_DAYS = 2; // 헤드라인이 이보다 오래되면 첫 화면을 줄이고 "새 소식 없음"을 알린다
   const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
   // 원문 주소 → 회사 이름 (LLM 카드 머리글)
@@ -113,6 +114,7 @@
     modalRoot.setAttribute("aria-hidden", "true");
     modalRoot.hidden = true;
     modalRoot.innerHTML = "";
+    document.documentElement.classList.remove("modal-open");
     if (lastTrigger) {
       lastTrigger.focus();
       lastTrigger = null;
@@ -151,6 +153,7 @@
     modalRoot.append(sheet);
     modalRoot.hidden = false;
     modalRoot.setAttribute("aria-hidden", "false");
+    document.documentElement.classList.add("modal-open");
     requestAnimationFrame(() => {
       modalRoot.classList.add("is-open");
       closeBtn.focus();
@@ -162,7 +165,27 @@
       if (e.target === modalRoot) closeModal();
     });
     window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !modalRoot.hidden) closeModal();
+      if (modalRoot.hidden) return;
+      if (e.key === "Escape") {
+        closeModal();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      // 포커스를 모달 안에 가둔다
+      const focusable = [...modalRoot.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!modalRoot.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
   }
 
@@ -239,10 +262,13 @@
     if (!headlineItem) return null;
 
     const ago = daysBetween(latest.date, today);
-    const badgeLabel = `${longDate(latest.date)} · ${ago > 0 ? `${ago}일 전 헤드라인` : "TODAY'S HEADLINE"}`;
+    const stale = ago >= STALE_DAYS;
+    const badgeLabel = stale
+      ? `최근 새 소식이 없습니다 · 마지막 브리핑 ${longDate(latest.date)}`
+      : `${longDate(latest.date)} · ${ago > 0 ? `${ago}일 전 헤드라인` : "TODAY'S HEADLINE"}`;
     const leadLine = headlineItem.card && headlineItem.card[0] ? headlineItem.card[0] : "";
 
-    return el("section", { class: "hero-stage", "aria-label": "오늘의 한 줄" },
+    return el("section", { class: `hero-stage${stale ? " is-stale" : ""}`, "aria-label": stale ? "마지막 헤드라인" : "오늘의 한 줄" },
       heroCoffeeEmblem(),
       el("div", { class: "hero-badge-row" },
         el("span", { class: "pulse-dot", "aria-hidden": "true" }),
@@ -322,7 +348,11 @@
       if (slide) {
         const gap = parseFloat(getComputedStyle(rail).columnGap) || 14;
         const idx = Math.min(rows.length - 1, Math.max(0, Math.round(rail.scrollLeft / (slide.offsetWidth + gap))));
-        dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+        dots.forEach((d, i) => {
+          d.classList.toggle("active", i === idx);
+          if (i === idx) d.setAttribute("aria-current", "true");
+          else d.removeAttribute("aria-current");
+        });
       }
     };
 
@@ -337,7 +367,7 @@
       sectionHead("llm", "GLOBAL AI LABS", title, countText, el("div", { class: "nav-buttons" }, prev, next)),
       rail,
       rows.length > 1 && el("div", { class: "rail-footer" },
-        el("div", { class: "rail-dots", role: "tablist", "aria-label": "카드 순서" }, dots),
+        el("div", { class: "rail-dots", role: "group", "aria-label": "카드 순서" }, dots),
         el("p", { class: "swipe-hint" }, `${rows.length}장의 카드 · 좌우로 스와이프`)));
   }
 
@@ -367,9 +397,10 @@
         "data-section": "hiring",
         "data-state": state,
       },
-      el("div", { class: "dday", "aria-label": `마감 ${left === 0 ? "오늘" : `${left}일 남음`}` },
+      el("div", { class: "dday" },
         el("span", { "aria-hidden": "true" }, urgent ? "임박" : "마감"),
-        el("strong", { "aria-hidden": "true" }, left === 0 ? "D-DAY" : `D-${left}`)),
+        el("strong", { "aria-hidden": "true" }, left === 0 ? "D-DAY" : `D-${left}`),
+        el("span", { class: "sr-only" }, left === 0 ? "오늘 마감" : `마감까지 ${left}일`)),
       el("div", { class: "job-body" },
         el("p", { class: "job-meta" },
           el("span", { class: `state-pill${isNew ? " new" : urgent ? " soon" : ""}` }, state),
@@ -397,7 +428,7 @@
         el("div", {},
           el("p", { class: "section-kicker" }, "AUTONOMOUS PIPELINE TELEMETRY"),
           el("h2", {}, "오늘의 AI 수집·검증 파이프라인 지표")),
-        el("p", { class: "telemetry-sub" }, "매일 아침 07:23 KST 자동 수집 · 원문 대조 검증 후 공개")),
+        el("p", { class: "telemetry-sub" }, "AI가 원문과 대조해 검증하고, 사람이 승인한 뒤 공개")),
       el("dl", { class: "stats" },
         [["오늘 공개", `${todayCount}건`], ["수집 후보", `${run.candidates}건`],
           ["검증 수정", `${run.verification_edits}곳`], ["마지막 실행", shortDate(run.date)]]
@@ -460,6 +491,12 @@
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // 마우스가 있는 기기에서만 움직인다. 터치 기기는 반응할 커서가 없으므로 한 번만 그린다
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const animate = finePointer && !reduced;
+    const IDLE_MS = 2500; // 마우스가 멈추고 이만큼 지나면 그리기를 쉰다
+    let running = false;
+    let lastMove = 0;
     let width = 0;
     let height = 0;
     let dots = [];
@@ -482,19 +519,37 @@
       }
     }
 
+    function start() {
+      if (running || !animate || document.hidden) return;
+      running = true;
+      requestAnimationFrame(draw);
+    }
+
     window.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
       mouse.x = e.clientX;
       mouse.y = e.clientY;
       mouse.active = true;
+      lastMove = performance.now();
       document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
       document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+      start();
     }, { passive: true });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) start();
+    });
 
     window.addEventListener("pointerleave", () => {
       mouse.active = false;
+      lastMove = performance.now(); // 밀려난 점들이 제자리로 돌아올 때까지 그린다
+      start();
     });
 
-    window.addEventListener("resize", buildGrid);
+    window.addEventListener("resize", () => {
+      buildGrid();
+      if (!running) requestAnimationFrame(draw);
+    });
     buildGrid();
 
     function draw(t) {
@@ -532,8 +587,11 @@
         ctx.fill();
       }
 
-      if (!reduced) {
+      // 탭이 숨겨졌거나 마우스가 한동안 멈추면 쉬고, 다음 움직임에 다시 시작한다
+      if (running && !document.hidden && performance.now() - lastMove < IDLE_MS) {
         requestAnimationFrame(draw);
+      } else {
+        running = false;
       }
     }
 
