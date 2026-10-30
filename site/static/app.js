@@ -84,7 +84,7 @@
   const today = todayKst();
   const items = data.days.flatMap((day) => day.items.map((item) => ({ ...item, date: day.date })));
 
-  // ---------- 상세 모달 (카드 높이 늘어남 방지) ----------
+  // ---------- 상세 모달 (카드 높이 늘어남 방지 + 포커스 가두기) ----------
 
   let lastTrigger = null;
 
@@ -171,7 +171,6 @@
         return;
       }
       if (e.key !== "Tab") return;
-      // 포커스를 모달 안에 가둔다
       const focusable = [...modalRoot.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
       if (!focusable.length) return;
       const first = focusable[0];
@@ -254,6 +253,43 @@
     return el("div", { class: "hero-emblem-wrap", "aria-hidden": "true" }, s);
   }
 
+  function heroTopicPills() {
+    const previewItems = items
+      .filter((i) => {
+        const ago = daysBetween(i.date, today);
+        if (i.section === "llm") return ago >= 0 && ago < LLM_DAYS;
+        if (i.section === "hiring" && i.hiring) return ago >= 0 && daysBetween(today, i.hiring.deadline) >= 0;
+        return false;
+      })
+      .slice(0, 5);
+    if (!previewItems.length) return null;
+
+    return el("div", { class: "hero-topics", "aria-label": "오늘의 주요 브리핑 토픽" },
+      previewItems.map((item, idx) => {
+        const tag = item.section === "llm"
+          ? orgOf(item)
+          : `D-${Math.max(0, daysBetween(today, item.hiring.deadline))}`;
+        const shortTitle = item.title.length > 22 ? `${item.title.slice(0, 22)}…` : item.title;
+        return el("a", {
+          class: "topic-pill",
+          href: `#item-${item.id}`,
+          style: `--pill-idx: ${idx}`,
+          onclick: (e) => {
+            const target = document.getElementById(`item-${item.id}`);
+            if (target) {
+              e.preventDefault();
+              target.scrollIntoView({ behavior: "smooth", block: "center" });
+              target.classList.remove("flash-highlight");
+              void target.offsetWidth;
+              target.classList.add("flash-highlight");
+            }
+          },
+        },
+        el("span", { class: "topic-pill-tag" }, tag),
+        el("span", { class: "topic-pill-text" }, shortTitle));
+      }));
+  }
+
   function heroStage() {
     const latest = data.days[data.days.length - 1];
     if (!latest) return null;
@@ -269,23 +305,26 @@
     const leadLine = headlineItem.card && headlineItem.card[0] ? headlineItem.card[0] : "";
 
     return el("section", { class: `hero-stage${stale ? " is-stale" : ""}`, "aria-label": stale ? "마지막 헤드라인" : "오늘의 한 줄" },
-      heroCoffeeEmblem(),
-      el("div", { class: "hero-badge-row" },
-        el("span", { class: "pulse-dot", "aria-hidden": "true" }),
-        el("p", { class: "eyebrow" }, badgeLabel)),
-      el("div", { class: "headline" },
-        el("h2", { class: "headline-text" }, latest.headline.text),
-        leadLine && el("p", { class: "hero-lead" }, leadLine),
-        el("div", { class: "hero-actions" },
-          el("button", {
-            type: "button",
-            class: "btn-primary",
-            onclick: (e) => openModal({ ...headlineItem, date: latest.date }, e.currentTarget),
-          }, "헤드라인 브리핑 열기 ↗"),
-          el("a", { class: "btn-secondary", href: "#showcase-deck" }, "전체 브리핑 탐색 ↓"))),
+      el("div", { class: "hero-parallax-inner" },
+        heroCoffeeEmblem(),
+        el("div", { class: "hero-badge-row" },
+          el("span", { class: "pulse-dot", "aria-hidden": "true" }),
+          el("p", { class: "eyebrow" }, badgeLabel)),
+        el("div", { class: "headline" },
+          el("h2", { class: "headline-text" }, latest.headline.text),
+          leadLine && el("p", { class: "hero-lead" }, leadLine),
+          el("div", { class: "hero-actions" },
+            el("button", {
+              type: "button",
+              class: "btn-primary",
+              onclick: (e) => openModal({ ...headlineItem, date: latest.date }, e.currentTarget),
+            }, "헤드라인 브리핑 열기 ↗"),
+            el("a", { class: "btn-secondary", href: "#showcase-deck" }, "전체 브리핑 탐색 ↓")),
+          !stale && heroTopicPills())),
       el("div", { class: "scroll-cue", "aria-hidden": "true" },
-        el("span", {}, "SCROLL TO EXPAND"),
-        el("span", { class: "scroll-cue-line" })));
+        el("span", { class: "scroll-cue-label" }, "SCROLL TO EXPAND"),
+        el("span", { class: "scroll-cue-line" },
+          el("span", { class: "scroll-cue-drop" }))));
   }
 
   // ---------- LLM: 넘기는 카드 + 도트 인디케이터 ----------
@@ -437,38 +476,67 @@
 
   // ---------- 스크롤 연동 스케일업 & 인터랙티브 배경 ----------
 
-  function initScrollInteractions(showcaseEl) {
+  function initScrollInteractions(heroEl, showcaseEl) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const revealCards = document.querySelectorAll(".reveal-card");
+
+    revealCards.forEach((c, idx) => {
+      c.style.setProperty("--stagger-idx", String(idx % 4));
+      c.addEventListener("pointermove", (e) => {
+        const r = c.getBoundingClientRect();
+        c.style.setProperty("--card-x", `${(e.clientX - r.left).toFixed(0)}px`);
+        c.style.setProperty("--card-y", `${(e.clientY - r.top).toFixed(0)}px`);
+      }, { passive: true });
+    });
 
     if (reduced) {
       revealCards.forEach((c) => c.classList.add("is-visible"));
       if (showcaseEl) {
         showcaseEl.style.setProperty("--deck-scale", "1");
         showcaseEl.style.setProperty("--deck-y", "0px");
+        showcaseEl.style.setProperty("--deck-rx", "0deg");
       }
       return;
     }
 
-    // Google 스토어/Antigravity 스타일: 스크롤 시 하단 컨테이너가 0.92 → 1.0으로 확대
-    const updateDeckScale = () => {
-      if (!showcaseEl) return;
-      const rect = showcaseEl.getBoundingClientRect();
+    // 교차 원근감(Cross-Scale Parallax): 히어로는 뒤로 물러나고 쇼케이스는 0.74 → 1.00으로 웅장하게 확대
+    const updateScrollStage = () => {
       const vh = window.innerHeight || 800;
-      // 화면 하단(vh * 0.92)에서 화면 상단(vh * 0.28)으로 올라오는 동안 0 → 1 진행
-      const start = vh * 0.92;
-      const end = vh * 0.25;
-      const raw = (start - rect.top) / (start - end);
-      const progress = Math.min(1, Math.max(0, raw));
-      const scale = 0.92 + 0.08 * progress;
-      const y = (1 - progress) * 26;
-      showcaseEl.style.setProperty("--deck-scale", scale.toFixed(4));
-      showcaseEl.style.setProperty("--deck-y", `${y.toFixed(1)}px`);
+      const sy = window.scrollY || window.pageYOffset || 0;
+
+      if (heroEl) {
+        const heroProgress = Math.min(1, Math.max(0, sy / (vh * 0.68)));
+        const hScale = 1 - heroProgress * 0.15;
+        const hOpacity = 1 - heroProgress * 0.85;
+        const hY = heroProgress * 64;
+        heroEl.style.setProperty("--hero-scale", hScale.toFixed(4));
+        heroEl.style.setProperty("--hero-opacity", hOpacity.toFixed(4));
+        heroEl.style.setProperty("--hero-y", `${hY.toFixed(1)}px`);
+      }
+
+      if (showcaseEl) {
+        const rect = showcaseEl.getBoundingClientRect();
+        // 화면 하단 끝(vh * 0.96)에서 화면 상단(vh * 0.20)으로 올라오는 동안 0 → 1 진행
+        const start = vh * 0.96;
+        const end = vh * 0.20;
+        const raw = (start - rect.top) / (start - end);
+        const progress = Math.min(1, Math.max(0, raw));
+        // Ease-out 곡선으로 스크롤 시 확 커지는 체감 극대화
+        const eased = 1 - Math.pow(1 - progress, 2.2);
+        const scale = 0.74 + 0.26 * eased;
+        const y = (1 - eased) * 72;
+        const rx = (1 - eased) * 9.5;
+        const glow = 0.1 + eased * 0.35;
+        showcaseEl.style.setProperty("--deck-scale", scale.toFixed(4));
+        showcaseEl.style.setProperty("--deck-y", `${y.toFixed(1)}px`);
+        showcaseEl.style.setProperty("--deck-rx", `${rx.toFixed(2)}deg`);
+        showcaseEl.style.setProperty("--deck-glow", glow.toFixed(3));
+      }
     };
 
-    window.addEventListener("scroll", updateDeckScale, { passive: true });
-    window.addEventListener("resize", updateDeckScale);
-    requestAnimationFrame(updateDeckScale);
+    window.addEventListener("scroll", updateScrollStage, { passive: true });
+    window.addEventListener("resize", updateScrollStage);
+    requestAnimationFrame(updateScrollStage);
 
     if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver((entries) => {
@@ -491,12 +559,7 @@
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // 마우스가 있는 기기에서만 움직인다. 터치 기기는 반응할 커서가 없으므로 한 번만 그린다
-    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const animate = finePointer && !reduced;
-    const IDLE_MS = 2500; // 마우스가 멈추고 이만큼 지나면 그리기를 쉰다
     let running = false;
-    let lastMove = 0;
     let width = 0;
     let height = 0;
     let dots = [];
@@ -510,17 +573,17 @@
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const spacing = width < 720 ? 44 : 52;
+      const spacing = width < 720 ? 44 : 50;
       dots = [];
       for (let x = spacing / 2; x < width; x += spacing) {
         for (let y = spacing / 2; y < height; y += spacing) {
-          dots.push({ ox: x, oy: y, x, y, phase: (x * 0.015) + (y * 0.015) });
+          dots.push({ ox: x, oy: y, x, y, phase: (x * 0.016) + (y * 0.016) });
         }
       }
     }
 
     function start() {
-      if (running || !animate || document.hidden) return;
+      if (running || reduced || document.hidden) return;
       running = true;
       requestAnimationFrame(draw);
     }
@@ -530,7 +593,6 @@
       mouse.x = e.clientX;
       mouse.y = e.clientY;
       mouse.active = true;
-      lastMove = performance.now();
       document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
       document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
       start();
@@ -542,8 +604,6 @@
 
     window.addEventListener("pointerleave", () => {
       mouse.active = false;
-      lastMove = performance.now(); // 밀려난 점들이 제자리로 돌아올 때까지 그린다
-      start();
     });
 
     window.addEventListener("resize", () => {
@@ -554,15 +614,15 @@
 
     function draw(t) {
       ctx.clearRect(0, 0, width, height);
-      const time = (t || 0) * 0.0012;
-      const radius = 170;
+      const time = (t || 0) * 0.0014;
+      const radius = 210;
 
       for (let i = 0; i < dots.length; i++) {
         const d = dots[i];
-        let tx = d.ox + Math.sin(time + d.phase) * 2.2;
-        let ty = d.oy + Math.cos(time + d.phase) * 2.2;
-        let alpha = 0.16;
-        let size = 1.35;
+        let tx = d.ox + Math.sin(time + d.phase) * 2.8;
+        let ty = d.oy + Math.cos(time + d.phase) * 2.8;
+        let alpha = 0.18;
+        let size = 1.4;
 
         if (mouse.active) {
           const dx = tx - mouse.x;
@@ -570,11 +630,10 @@
           const dist = Math.hypot(dx, dy);
           if (dist < radius && dist > 0.1) {
             const force = (1 - dist / radius);
-            // Antigravity-style subtle repulsion + warm Crema glow
-            tx += (dx / dist) * force * 16;
-            ty += (dy / dist) * force * 16;
-            alpha = 0.16 + force * 0.58;
-            size = 1.35 + force * 1.6;
+            tx += (dx / dist) * force * 20;
+            ty += (dy / dist) * force * 20;
+            alpha = 0.18 + force * 0.65;
+            size = 1.4 + force * 1.9;
           }
         }
 
@@ -587,15 +646,18 @@
         ctx.fill();
       }
 
-      // 탭이 숨겨졌거나 마우스가 한동안 멈추면 쉬고, 다음 움직임에 다시 시작한다
-      if (running && !document.hidden && performance.now() - lastMove < IDLE_MS) {
+      if (!reduced && !document.hidden) {
         requestAnimationFrame(draw);
       } else {
         running = false;
       }
     }
 
-    requestAnimationFrame(draw);
+    if (reduced) {
+      requestAnimationFrame(draw);
+    } else {
+      start();
+    }
   }
 
   // ---------- 그리기 ----------
@@ -612,7 +674,7 @@
     const telemetryEl = telemetrySection();
 
     app.append(heroEl || "", showcaseEl, telemetryEl || "");
-    initScrollInteractions(showcaseEl);
+    initScrollInteractions(heroEl, showcaseEl);
   }
 
   initAmbientCanvas();
