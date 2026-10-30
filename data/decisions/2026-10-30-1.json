@@ -1,0 +1,14 @@
+{
+  "decided_at": "2026-10-30T20:25:45+09:00",
+  "via": "drop",
+  "pr": 10,
+  "items": [
+    {
+      "item_id": "2026-10-28-02",
+      "status": "rejected",
+      "event_key": "예시AI 코딩 도구 업데이트",
+      "title": "예시AI 코딩 도구 업데이트",
+      "url": "https://example.com/news/coder-update"
+    }
+  ]
+}
