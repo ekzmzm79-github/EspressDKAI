@@ -12,7 +12,7 @@ const [site, out, today] = process.argv.slice(2);
     page.on('pageerror', (e) => errors.push(`${name}: ${e.message}`));
     await page.goto(`file://${site}/index.html?today=${today}`);
     await page.screenshot({ path: `${out}/${name}.png`, fullPage: true });
-    const summary = await page.$$eval('.card', (cs) => cs.map((c) => `${c.dataset.section} open=${c.querySelector('details').open} ${c.querySelector('.badge')?.textContent ?? '-'} | ${c.querySelector('h3').textContent}`));
+    const summary = await page.$$eval('article[data-section]', (cs) => cs.map((c) => `${c.dataset.section} ${c.dataset.state} | ${c.querySelector('h3').textContent}`));
     if (name === 'mobile-light') console.log(summary.join('\n'));
     const sw = await page.evaluate(() => document.documentElement.scrollWidth);
     if (sw > width) errors.push(`${name}: 가로 스크롤 ${sw}px`);
