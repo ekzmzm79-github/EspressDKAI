@@ -13,7 +13,7 @@
 | # | 기획서 | 변경 | 이유 |
 |---|---|---|---|
 | C1 | 날짜 기준 명시 없음 | 모든 날짜는 **KST**(`Asia/Seoul`) 기준 | 클라우드 컨테이너 시계는 UTC. 7:30 KST는 UTC 전날 22:30이라 날짜가 하루 밀린다 |
-| C2 | 매일 새 PR | **이어 쓰기 PR 하나** (`claude/briefing`). 열린 PR이 있으면 같은 브랜치에 그날 커밋을 추가 | Merge를 미루면 다음 날 실행이 어제 데이터를 못 보고 중복을 만들며, PR끼리 충돌한다 |
+| C2 | 매일 새 PR | **이어 쓰기 PR 하나**. 열린 브리핑 PR이 있으면 그 브랜치에 그날 커밋을 추가, 없으면 `claude/briefing-<KST 날짜>`로 새로 시작 | Merge를 미루면 다음 날 실행이 어제 데이터를 못 보고 중복을 만들며, PR끼리 충돌한다 |
 | C3 | AI가 `data/index.json` 수정 | AI는 **그날 파일만 새로 만든다**(추가 전용). 색인은 스크립트가 파일들에서 매번 파생 | 공유 파일을 여러 PR이 고치면 충돌한다. 추가 전용이면 충돌이 원리적으로 없다 |
 | C4 | 형식 검사는 Merge 후 | **PR 단계에서도 검사**(상태 체크). Merge 후에는 배포 직전 한 번 더 | 휴대폰에서 ✅/❌를 보고 Merge한다. 깨진 데이터가 main에 들어가지 않는다 |
 | C5 | 링크 응답 실패 시 배포 중단 | 링크 검사는 **경고만**. 배포를 막는 건 스키마·날짜·인용 길이 등 기계 판정 항목 | 언론·기업 사이트 다수가 Actions IP에 403을 준다 |
@@ -23,6 +23,7 @@
 | C9 | 명시 없음 | Actions가 만든 변경이 다른 워크플로를 깨우도록 **GitHub App 토큰** 사용 | `GITHUB_TOKEN`으로 만든 커밋·Merge는 다른 워크플로를 트리거하지 않는다 |
 | C10 | 명시 없음 | 클라우드 세션의 GitHub 조작은 **REST API**(`gh api`)만 쓴다 | 클라우드 세션에서는 GraphQL이 막혀 `gh pr list`, `gh pr create`가 동작하지 않는다 |
 | C11 | 명시 없음 | 최근 7일 안에 공개된 원문 URL과 같은 항목은 **화면 생성 시 자동 제외**. 데이터 파일은 고치지 않는다 | 같은 기사를 다시 볼 필요는 없고, 데이터를 몰래 고치지 않으려고 |
+| C12 | 명시 없음 | 브랜치를 **덮어쓰거나 지우지 않는다.** 새 브리핑은 날짜 붙은 새 브랜치, 닫힌 PR의 브랜치 삭제는 Actions가 | 클라우드 세션에서 강제 푸시는 자동 권한 모드가 막고, 원격 브랜치 삭제는 프록시가 막는다 |
 
 ---
 
@@ -30,12 +31,11 @@
 
 ```
 [07:23 KST] Claude 예약 작업 (클라우드 세션, 구독 사용량)
-   ├─ claude/briefing 브랜치 준비 (열린 PR 있으면 이어 쓰기)
+   ├─ python scripts/briefing_branch.py prepare  (열린 PR 있으면 이어 쓰기)
    ├─ 색인 확인: python scripts/index.py  → 최근 7일 처리 기록 (main + 열린 PR)
    ├─ 수집 → 취합·초안 → 검증 서브에이전트(원문 대조)
    ├─ data/days/<날짜>.json, data/runs/<날짜>.json 작성
-   ├─ python scripts/validate.py  (로컬, 네트워크 없이)
-   └─ 커밋·푸시, PR 생성 또는 갱신 (PR 본문은 스크립트가 생성)
+   └─ python scripts/briefing_branch.py publish  (검사 → 커밋·푸시 → PR 생성·갱신, 본문은 스크립트가 생성)
 
 [PR 이벤트] pr-check.yml : 형식 검사 → 상태 체크 ✅/❌, 링크 검사 경고
 [PR 코멘트] drop.yml     : /drop <id> (저장소 주인만) → 항목 제거 커밋
@@ -70,7 +70,8 @@ data/                          # AI가 쓰는 곳은 days/, runs/ 뿐
   runs/YYYY-MM-DD.json         # 실행 지표 (추가 전용)
   decisions/YYYY-MM-DD-<n>.json# 사람 결정(rejected) 기록 — Actions만 씀
 scripts/                       # Python 3.12, 표준 라이브러리 + jsonschema, jinja2, pyyaml
-  prepare_branch.py            # 예약 실행 시작 시 이어 쓸 브랜치 결정
+  briefing_branch.py           # 예약 실행의 브랜치·PR 처리 (prepare / publish / check-paths)
+  link_check.py                # 원문 링크 응답 확인 (경고만)
   github_pr.py                 # PR 조회·생성·갱신 (REST)
   index.py                     # 최근 7일 색인을 파생해 출력
   validate.py
@@ -109,14 +110,14 @@ tests/                         # 스크립트 단위 테스트, 화면 스크린
 
 ## 4. 이어 쓰기 PR 흐름 (C2)
 
-예약 실행이 시작할 때 브랜치를 이렇게 정한다. 이 판단은 AI가 아니라 `scripts/prepare_branch.py`가 한다.
+예약 실행이 시작할 때 브랜치를 이렇게 정한다. 이 판단은 AI가 아니라 `scripts/briefing_branch.py prepare`가 한다.
 
-1. `claude/briefing`의 **열린 PR이 있으면** 그 브랜치를 받아 이어 쓴다.
-2. **없으면** main에서 `claude/briefing`을 새로 만든다(이전 브랜치가 남아 있으면 덮어쓴다. Merge·닫힘 후 브랜치 자동 삭제 설정을 켜 둔다).
+1. 브랜치 이름이 `claude/briefing-`로 시작하는 **열린 PR이 있으면** 그 브랜치를 받고, 그사이 main에 들어온 변경을 합쳐 이어 쓴다.
+2. **없으면** main에서 `claude/briefing-<KST 날짜>`를 새로 만든다. 같은 이름의 브랜치가 남아 있으면 `-2`, `-3`을 붙인다. 덮어쓰지 않으므로 강제 푸시가 없다(C12).
 3. 오늘 데이터를 커밋하고, `pr_summary.py`로 PR 본문을 **날짜별 섹션**으로 다시 만든다.
 4. PR 조회·생성·본문 갱신은 모두 REST API로 한다(C10). `scripts/github_pr.py`가 감싼다.
 
-**두 섹션 모두 비는 날:** 열린 PR이 있으면 `runs/` 파일만 거기에 추가한다. 없으면 `claude/log-<날짜>` PR을 따로 올리고, `data/runs/`만 바뀐 PR은 `auto-merge-log.yml`이 자동 Merge한다(배포 없음).
+**두 섹션 모두 비는 날:** 같은 흐름으로 `runs/` 파일만 올린다. 열린 PR이 있으면 거기에 붙고, 없으면 새 PR이 된다. `data/runs/`만 바뀐 PR은 `auto-merge-log.yml`이 자동 Merge한다(배포 없음). 별도 로그 브랜치는 두지 않는다.
 
 **늦게 승인하거나 순서가 바뀌어도 안전한 이유**
 
@@ -154,7 +155,7 @@ tests/                         # 스크립트 단위 테스트, 화면 스크린
 | `pr-check.yml` | `pull_request` | `validate.py`, 링크 경고 코멘트 |
 | `deploy.yml` | main push, `workflow_call` | 검사 → `build.py` → Pages 배포 |
 | `drop.yml` | `issue_comment` | 작성자가 저장소 주인일 때만 `/drop <id>` 처리 후 커밋 |
-| `record-close.yml` | `pull_request: closed` (Merge 아님) | 남은 항목 전부 `data/decisions/`에 rejected로 main에 기록 |
+| `record-close.yml` | `pull_request: closed` (Merge 아님) | 남은 항목 전부 `data/decisions/`에 rejected로 main에 기록하고 브랜치 삭제 |
 | `auto-merge-log.yml` | `pull_request` | `data/runs/`만 바뀐 PR 자동 Merge |
 | `auto-merge.yml` | `schedule` 03:00 UTC = 12:00 KST | 저장소 변수 `AUTO_MERGE=on`이고 ✅이고 `hold` 라벨이 없으면 Merge 후 `deploy.yml` 호출 |
 
@@ -203,7 +204,7 @@ tests/                         # 스크립트 단위 테스트, 화면 스크린
 | **M0-1 기반** | `requirements.txt`, `config/`, `schema/`, `scripts/common.py`(KST 날짜·데이터 로딩), 테스트용 샘플 데이터(`tests/fixtures/`), pytest, 테스트 워크플로 | 샘플 데이터가 스키마를 통과하고 CI에서 pytest가 돈다 |
 | **M0-2 색인·검사** | `index.py`, `validate.py` | 정상·위반 샘플마다 기대한 결과. 색인이 main과 브랜치 데이터를 합쳐 7일 범위를 낸다 |
 | **M0-3 화면 생성·배포** | `build.py`(URL 중복 제외 포함), 기본 템플릿, `deploy.yml`, Pages 설정 | 샘플 데이터로 Pages에 페이지가 뜬다 |
-| **M0-4 PR 흐름** | `github_pr.py`, `prepare_branch.py`, `pr_summary.py`, `pr-check.yml` | 클라우드 세션에서 샘플 데이터로 이어 쓰기 PR을 만들고, 두 번째 실행이 같은 PR에 붙는다 |
+| **M0-4 PR 흐름** | `github_pr.py`, `briefing_branch.py`, `pr_summary.py`, `link_check.py`, `pr-check.yml` | 클라우드 세션에서 샘플 데이터로 이어 쓰기 PR을 만들고, 두 번째 실행이 같은 PR에 붙는다 |
 | **M0-5 사람 결정** | GitHub App 토큰, `drop.py`·`drop.yml`, `record-close.yml`, `auto-merge-log.yml`, `auto-merge.yml`(꺼진 상태), main 보호·브랜치 자동 삭제 설정 | `/drop`, PR 닫힘 기록, 로그 PR 자동 Merge가 실제로 동작 |
 
 샘플 데이터는 `tests/fixtures/`에만 둔다. `data/`에 넣으면 실제로 공개되기 때문이다.

@@ -1,6 +1,7 @@
 id: hiring
 title: AI 채용·해커톤
 public: true
+order: 2
 max_items: 5
 
 # 새 항목은 최근 7일 안에 나온 소식. 공개된 항목은 마감일까지 화면에 남는다

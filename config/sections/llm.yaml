@@ -1,6 +1,7 @@
 id: llm
 title: LLM 개발사
 public: true
+order: 1
 max_items: 5            # 상한이 아니라 기준. 넘기면 이유를 PR 요약에 적는다
 
 # 원문 발행 시각이 실행 시각 기준 이 범위 안이어야 한다
