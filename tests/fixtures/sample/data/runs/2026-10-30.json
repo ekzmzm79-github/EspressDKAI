@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-30",
+  "started_at": "2026-10-30T07:23:15+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 1,
+      "passed": 1,
+      "verification_edits": 0,
+      "skipped": []
+    },
+    "hiring": {
+      "candidates": 1,
+      "passed": 1,
+      "verification_edits": 0,
+      "skipped": []
+    }
+  }
+}

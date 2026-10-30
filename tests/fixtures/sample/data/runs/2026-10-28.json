@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-28",
+  "started_at": "2026-10-28T07:23:40+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 3,
+      "passed": 2,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "예시랩 샘플-1 모델 공개",
+          "title": "재탕 기사",
+          "url": "https://example.com/press/sample-1-repost",
+          "reason": "같은 사건의 재탕 기사"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 1,
+      "passed": 1,
+      "verification_edits": 0,
+      "skipped": []
+    }
+  }
+}

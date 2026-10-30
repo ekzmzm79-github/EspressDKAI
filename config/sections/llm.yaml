@@ -1,0 +1,40 @@
+id: llm
+title: LLM 개발사
+public: true
+max_items: 5            # 상한이 아니라 기준. 넘기면 이유를 PR 요약에 적는다
+
+# 원문 발행 시각이 실행 시각 기준 이 범위 안이어야 한다
+window:
+  hours: 24
+
+# 출처 주소는 M1 수동 실행에서 실제로 읽히는지 확인하고 고친다
+sources:
+  - name: Anthropic 뉴스
+    url: https://www.anthropic.com/news
+    role: primary
+  - name: Claude 릴리스 노트
+    url: https://docs.anthropic.com/en/release-notes/overview
+    role: primary
+  - name: Claude Code 변경 기록
+    url: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
+    role: primary
+  - name: Google 블로그 AI
+    url: https://blog.google/technology/ai/
+    role: primary
+  - name: Google DeepMind 블로그
+    url: https://deepmind.google/discover/blog/
+    role: primary
+  - name: Gemini 릴리스 노트
+    url: https://gemini.google/release-notes/
+    role: primary
+  - name: OpenAI 뉴스
+    url: https://openai.com/news/
+    role: primary
+  - name: ChatGPT 릴리스 노트
+    url: https://help.openai.com/en/articles/6825453-chatgpt-release-notes
+    role: primary
+  - name: Codex 변경 기록
+    url: https://developers.openai.com/codex/changelog
+    role: primary
+  - name: 언론 보도
+    role: secondary     # 해석이 필요한 큰 발표에만

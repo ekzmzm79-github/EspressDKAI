@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-29",
+  "started_at": "2026-10-29T07:25:02+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 2,
+      "passed": 1,
+      "verification_edits": 1,
+      "skipped": [
+        {
+          "event_key": "예시 스타트업 투자 유치",
+          "url": "https://example.com/news/funding",
+          "reason": "섹션 범위 밖"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 0,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": []
+    }
+  }
+}
