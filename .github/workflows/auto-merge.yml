@@ -1,0 +1,33 @@
+name: auto-merge
+
+# 매일 12:00 KST, 저장소 변수 AUTO_MERGE가 on이면 열린 브리핑 PR을 검사 통과 시 Merge한다.
+# 막으려면 PR에 hold 라벨을 붙인다. 기본은 꺼짐(변수 없음).
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-writes
+
+jobs:
+  merge:
+    if: vars.AUTO_MERGE == 'on'
+    runs-on: ubuntu-latest
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: python scripts/auto_merge.py

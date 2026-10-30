@@ -1,0 +1,55 @@
+name: record-close
+
+# 브리핑 PR이 Merge 없이 닫히면 남은 항목 전부를 거절로 main에 기록하고 브랜치를 지운다.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-writes
+
+jobs:
+  record:
+    if: >-
+      !github.event.pull_request.merged &&
+      startsWith(github.event.pull_request.head.ref, 'claude/briefing-') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ steps.app.outputs.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: 거절 기록
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git fetch -q origin "+refs/heads/$REF:refs/remotes/origin/$REF"
+          python scripts/decisions.py record-close "$PR" "origin/$REF"
+          python scripts/validate.py
+          git config user.name "espressdkai-bot"
+          git config user.email "espressdkai-bot@users.noreply.github.com"
+          git add data/decisions
+          if git diff --cached --quiet; then echo "기록할 항목 없음"; else
+            git commit -q -m "decision: PR #$PR 닫힘 → 거절 기록"
+            git push -q origin main
+          fi
+      - name: 브랜치 삭제
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          REF: ${{ github.event.pull_request.head.ref }}
+        run: gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$REF"

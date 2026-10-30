@@ -1,0 +1,27 @@
+name: app-token-check
+
+# GitHub App 토큰이 발급되는지 점검 (APP_ID, APP_PRIVATE_KEY). 토큰 값은 출력하지 않는다.
+# 키를 바꾼 뒤 Actions 탭에서 수동 실행한다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: 토큰으로 저장소 접근
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          echo "앱: ${{ steps.app.outputs.app-slug }}"
+          gh api "repos/${{ github.repository }}" --jq '"저장소: \(.full_name)"'
+          gh api "repos/${{ github.repository }}/pulls?state=all&per_page=1" --jq '"PR 조회: \(length)건"'
+          gh api /installation/repositories --jq '"설치된 저장소: \([.repositories[].full_name] | join(", "))"'

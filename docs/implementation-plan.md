@@ -154,10 +154,10 @@ tests/                         # 스크립트 단위 테스트, 화면 스크린
 |---|---|---|
 | `pr-check.yml` | `pull_request` | `validate.py`, 링크 경고 코멘트 |
 | `deploy.yml` | main push, `workflow_call` | 검사 → `build.py` → Pages 배포 |
-| `drop.yml` | `issue_comment` | 작성자가 저장소 주인일 때만 `/drop <id>` 처리 후 커밋 |
+| `drop.yml` | `issue_comment` | 작성자가 저장소 주인일 때만 `/drop <id>` 처리 후 PR 브랜치에 커밋, 결과 코멘트. 하루치가 모두 빠지면 그날 실행 기록을 empty로 |
 | `record-close.yml` | `pull_request: closed` (Merge 아님) | 남은 항목 전부 `data/decisions/`에 rejected로 main에 기록하고 브랜치 삭제 |
-| `auto-merge-log.yml` | `pull_request` | `data/runs/`만 바뀐 PR 자동 Merge |
-| `auto-merge.yml` | `schedule` 03:00 UTC = 12:00 KST | 저장소 변수 `AUTO_MERGE=on`이고 ✅이고 `hold` 라벨이 없으면 Merge 후 `deploy.yml` 호출 |
+| `auto-merge-log.yml` | `pull_request` | `data/runs/`만 바뀐 PR 자동 Merge (실행 정보가 바뀌므로 배포도 돈다) |
+| `auto-merge.yml` | `schedule` 03:00 UTC = 12:00 KST | 저장소 변수 `AUTO_MERGE=on`이고 필수 검사(`validate`, `pytest`) 통과, `hold` 라벨 없음이면 Merge. 앱 토큰으로 Merge하므로 main push가 `deploy.yml`을 깨운다 |
 
 **토큰(C9):** 개인용 GitHub App을 하나 만들어 그 토큰으로 커밋·Merge한다. 그래야 `drop.yml`의 커밋이 `pr-check.yml`을 다시 돌리고, 자동 Merge가 배포를 깨운다. 앱 키는 저장소 Secrets에만 둔다. (대안: 세분화된 PAT. 만료 관리가 번거로워 앱을 권장)
 
