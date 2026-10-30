@@ -153,3 +153,10 @@ def test_summary_marks_duplicate(tmp_path):
     body = pr_summary.summarize(["2026-10-30"], data)
     assert "중복으로 제외 예정" in body
     assert body.index("**LLM 개발사**") < body.index("**AI 채용·해커톤**")
+
+
+def test_check_paths_allows_drop_record_but_publish_does_not():
+    """/drop이 PR 브랜치에 남기는 거절 기록은 PR 검사를 통과하고, AI의 publish는 여전히 막는다."""
+    paths = ["data/days/2026-10-28.json", "data/decisions/2026-10-30-1.json"]
+    assert briefing_branch.disallowed(paths, briefing_branch.PR_ALLOWED) == []
+    assert briefing_branch.disallowed(paths) == ["data/decisions/2026-10-30-1.json"]
