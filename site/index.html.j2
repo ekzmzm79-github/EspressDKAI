@@ -5,25 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>EspressDKAI · AI 동향 브리핑</title>
-  <meta name="description" content="매일 아침 LLM 개발사 소식과 국내 AI 채용·해커톤 소식을 카드 한 장으로.">
+  <meta name="description" content="매일 아침 LLM 개발사 소식과 국내 AI 채용·해커톤 소식을 한눈에.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="static/style.css?v={{ version }}">
 </head>
 <body>
+  <div class="ambient-bg" aria-hidden="true">
+    <canvas id="bg-canvas"></canvas>
+    <div class="ambient-glow ambient-glow-1"></div>
+    <div class="ambient-glow ambient-glow-2"></div>
+    <div class="cursor-spotlight" id="cursor-spotlight"></div>
+  </div>
+
   <div class="wrap">
     <header class="top">
-      <div class="brand">
-        <svg class="logo" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 11h15v6a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6z"/><path d="M20 13h2a3 3 0 0 1 0 6h-2"/><path d="M10 4c0 2 2 2 2 4M14 4c0 2 2 2 2 4"/></svg>
-        <div>
-          <h1>EspressDKAI</h1>
+      <a href="#" class="brand" aria-label="EspressDKAI 홈">
+        <div class="brand-text">
+          <h1>Espress<span class="brand-accent">DKAI</span></h1>
           <p class="sub" id="today-label">매일 아침, AI 업계 소식을 카드 한 장으로</p>
         </div>
-      </div>
+      </a>
       <nav class="jump" aria-label="섹션 바로가기">
         <a href="#section-llm">LLM 개발사</a>
         <a href="#section-hiring">AI 채용·해커톤</a>
+        <a href="#section-telemetry">파이프라인 지표</a>
       </nav>
     </header>
 
@@ -33,6 +40,8 @@
 
     <footer id="run-info" class="foot"></footer>
   </div>
+
+  <div id="detail-modal" class="modal-backdrop" hidden aria-hidden="true"></div>
 
   <script id="briefing-data" type="application/json">{{ data_json | safe }}</script>
   <script src="static/app.js?v={{ version }}"></script>
