@@ -2,7 +2,7 @@
 
     python scripts/briefing_branch.py prepare             # 수집 전: 이어 쓸 브랜치 준비
     python scripts/briefing_branch.py publish             # 작성 후: 검사 → 커밋 → 푸시 → PR 생성·갱신
-    python scripts/briefing_branch.py check-paths         # PR이 data/days, data/runs 밖을 고쳤는지
+    python scripts/briefing_branch.py check-paths         # PR이 브리핑 데이터 밖을 고쳤는지
 
 열린 브리핑 PR이 있으면 그 브랜치에 이어 쓰고(계획서 C2), 없으면 main에서
 `claude/briefing-<KST 날짜>` 브랜치를 새로 만든다. 브랜치를 덮어쓰지 않으므로
@@ -24,7 +24,9 @@ import validate
 
 PREFIX = os.environ.get("BRIEFING_PREFIX", "claude/briefing-")
 BASE = os.environ.get("BRIEFING_BASE", "main")
-ALLOWED = ("data/days/", "data/runs/")
+ALLOWED = ("data/days/", "data/runs/")  # AI(publish)가 쓸 수 있는 곳
+# PR 검사에서 허용하는 곳. /drop이 PR 브랜치에 거절 기록을 남기므로 decisions도 포함
+PR_ALLOWED = (*ALLOWED, "data/decisions/")
 
 
 def git(*args: str, check: bool = True) -> str:
@@ -60,8 +62,8 @@ def changed_paths(base: str = f"origin/{BASE}") -> list[str]:
     return sorted(set(committed) | set(pending))
 
 
-def disallowed(paths: list[str]) -> list[str]:
-    return [p for p in paths if not p.startswith(ALLOWED)]
+def disallowed(paths: list[str], allowed: tuple[str, ...] = ALLOWED) -> list[str]:
+    return [p for p in paths if not p.startswith(allowed)]
 
 
 def pending_dates(paths: list[str]) -> list[str]:
@@ -127,12 +129,12 @@ def publish() -> None:
 
 
 def check_paths(base: str) -> None:
-    bad = disallowed(changed_paths(base))
+    bad = disallowed(changed_paths(base), PR_ALLOWED)
     if bad:
-        print("브리핑 PR은 data/days, data/runs만 바꿀 수 있다. 범위 밖 변경:")
+        print("브리핑 PR은 data/days, data/runs, data/decisions만 바꿀 수 있다. 범위 밖 변경:")
         print("\n".join(f"  {p}" for p in bad))
         sys.exit(1)
-    print("변경 범위 확인: data/days, data/runs만 바뀜")
+    print("변경 범위 확인: data/ 안의 브리핑 데이터만 바뀜")
 
 
 def main() -> None:
