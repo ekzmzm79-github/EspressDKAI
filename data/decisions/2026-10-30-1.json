@@ -1,0 +1,35 @@
+{
+  "decided_at": "2026-10-30T20:27:32+09:00",
+  "via": "pr-closed",
+  "pr": 10,
+  "items": [
+    {
+      "item_id": "2026-10-28-01",
+      "status": "rejected",
+      "event_key": "예시랩 샘플-1 모델 공개",
+      "title": "예시랩, 샘플-1 모델 공개",
+      "url": "https://example.com/news/sample-1"
+    },
+    {
+      "item_id": "2026-10-28-03",
+      "status": "rejected",
+      "event_key": "예시전자 AI 해커톤 본선, 11월 11일",
+      "title": "예시전자 채용연계 AI 해커톤",
+      "url": "https://example.com/hiring/hackathon"
+    },
+    {
+      "item_id": "2026-10-29-01",
+      "status": "rejected",
+      "event_key": "예시클라우드 에이전트 API 출시",
+      "title": "예시클라우드, 에이전트 API 출시",
+      "url": "https://example.com/news/agent-api"
+    },
+    {
+      "item_id": "2026-10-28-02",
+      "status": "rejected",
+      "event_key": "예시AI 코딩 도구 업데이트",
+      "title": "예시AI 코딩 도구 업데이트",
+      "url": "https://example.com/news/coder-update"
+    }
+  ]
+}
