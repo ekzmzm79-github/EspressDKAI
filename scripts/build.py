@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 from datetime import date, timedelta
@@ -77,6 +78,16 @@ def collect(data_dir: Path, today: date) -> dict:
     }
 
 
+def asset_version() -> str:
+    """static/ 내용이 바뀌면 바뀌는 값. CSS·JS 주소에 붙여 브라우저 캐시를 피한다."""
+    digest = hashlib.sha256()
+    for path in sorted((SITE_DIR / "static").rglob("*")):
+        if path.is_file():
+            digest.update(path.relative_to(SITE_DIR).as_posix().encode())
+            digest.update(path.read_bytes())
+    return digest.hexdigest()[:10]
+
+
 def build(data_dir: Path = common.DATA_DIR, out: Path = OUT_DIR, today: date | None = None) -> dict:
     payload = collect(data_dir, today or common.today_kst())
 
@@ -87,7 +98,7 @@ def build(data_dir: Path = common.DATA_DIR, out: Path = OUT_DIR, today: date | N
     # <script> 안에 넣으므로 "</"를 끊어 둔다
     data_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     env = Environment(loader=FileSystemLoader(SITE_DIR), autoescape=True)
-    html = env.get_template("index.html.j2").render(data_json=data_json)
+    html = env.get_template("index.html.j2").render(data_json=data_json, version=asset_version())
     (out / "index.html").write_text(html, encoding="utf-8")
     (out / "briefing.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     (out / ".nojekyll").touch()
