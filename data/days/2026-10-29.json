@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-29",
+  "headline": {
+    "item_id": "2026-10-29-01",
+    "text": "예시클라우드, 에이전트 API 출시"
+  },
+  "items": [
+    {
+      "id": "2026-10-29-01",
+      "section": "llm",
+      "event_key": "예시클라우드 에이전트 API 출시",
+      "title": "예시클라우드, 에이전트 API 출시",
+      "card": [
+        "예시클라우드, 에이전트 API 출시 핵심 1",
+        "예시클라우드, 에이전트 API 출시 핵심 2"
+      ],
+      "detail": "예시클라우드, 에이전트 API 출시에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시클라우드, 에이전트 API 출시 원문",
+          "url": "https://example.com/news/agent-api",
+          "published": "2026-10-29"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 1,
+        "note": "날짜 표기 수정"
+      }
+    }
+  ]
+}
