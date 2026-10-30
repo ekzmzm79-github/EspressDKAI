@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="static/style.css">
+  <link rel="stylesheet" href="static/style.css?v={{ version }}">
 </head>
 <body>
   <div class="wrap">
@@ -35,6 +35,6 @@
   </div>
 
   <script id="briefing-data" type="application/json">{{ data_json | safe }}</script>
-  <script src="static/app.js"></script>
+  <script src="static/app.js?v={{ version }}"></script>
 </body>
 </html>

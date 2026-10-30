@@ -90,3 +90,11 @@ def test_empty_data(tmp_path):
         (empty / sub).mkdir(parents=True)
     payload = build.build(empty, tmp_path / "site", TODAY)
     assert payload["days"] == [] and payload["last_run"] is None
+
+
+def test_assets_are_versioned(tmp_path):
+    build.build(SAMPLE_DATA, tmp_path / "site", TODAY)
+    html = (tmp_path / "site" / "index.html").read_text(encoding="utf-8")
+    v = build.asset_version()
+    assert len(v) == 10
+    assert f"static/style.css?v={v}" in html and f"static/app.js?v={v}" in html
