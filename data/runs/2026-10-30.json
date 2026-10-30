@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-30",
+  "started_at": "2026-10-30T20:54:00+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 4,
+      "passed": 3,
+      "verification_edits": 4,
+      "skipped": [
+        {
+          "event_key": "ChatGPT Pro·Business Premium의 Work·Codex 사용량 확대",
+          "title": "ChatGPT release notes (October 29, 2026)",
+          "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+          "reason": "출처가 자동 요청을 막아(403) 원문 확인 불가"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 5,
+      "passed": 2,
+      "verification_edits": 5,
+      "skipped": [
+        {
+          "event_key": "크래프톤 2027 채용연계형 인턴십, AI 역량 평가 도입",
+          "url": "https://www.sedaily.com/article/20101308",
+          "reason": "서류 접수가 10월 23일에 마감됨"
+        },
+        {
+          "event_key": "콘진원 게임인재원 AI 게임 해커톤 11월 5~6일",
+          "url": "https://www.thepowernews.co.kr/view.php?ud=202610291329598469de3f0aa1be_7",
+          "reason": "참가자 모집이 이미 마감됨"
+        },
+        {
+          "event_key": "SK하이닉스 AI 해커톤 2026 본선 11월 11일",
+          "url": "https://news.skhynix.co.kr/ai-hackathon-2026/",
+          "reason": "신청이 9월에 마감됨"
+        }
+      ]
+    }
+  },
+  "note": "M1 첫 수동 실행. 실행 시각 기준 24시간 안의 LLM 소식만 수집"
+}
