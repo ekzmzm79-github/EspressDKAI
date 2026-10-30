@@ -5,6 +5,7 @@
 
   const data = JSON.parse(document.getElementById("briefing-data").textContent);
   const app = document.getElementById("app");
+  const modalRoot = document.getElementById("detail-modal");
 
   const DAY_MS = 86400000;
   const LLM_DAYS = 7;
@@ -55,6 +56,7 @@
     for (const [k, v] of Object.entries(attrs || {})) {
       if (v === false || v == null) continue;
       if (k === "class") node.className = v;
+      else if (k === "onclick") node.addEventListener("click", v);
       else node.setAttribute(k, v === true ? "" : v);
     }
     for (const c of children.flat()) {
@@ -81,13 +83,11 @@
   const today = todayKst();
   const items = data.days.flatMap((day) => day.items.map((item) => ({ ...item, date: day.date })));
 
-  // ---------- 공통 조각 ----------
+  // ---------- 상세 모달 (카드 높이 늘어남 방지) ----------
 
-  function points(item) {
-    return el("ul", { class: "points" }, item.card.map((line) => el("li", {}, line)));
-  }
+  let lastTrigger = null;
 
-  function more(item) {
+  function buildDetailContent(item) {
     const v = item.verification;
     const verification = v.status === "fixed"
       ? `검증 단계에서 ${v.edits}곳 수정${v.note ? ` · ${v.note}` : ""}`
@@ -98,47 +98,171 @@
         ["접수", h.apply_start ? `${h.apply_start} ~ ${h.deadline}` : `~ ${h.deadline}`], ["혜택", h.benefit]]
         .filter(([, value]) => value)
         .flatMap(([k, value]) => [el("dt", {}, k), el("dd", {}, value)]));
-    return el("details", { class: "more" },
-      el("summary", {}, `자세히 · 원문 ${item.sources.length}`),
-      el("div", { class: "more-body" },
-        facts,
-        el("p", {}, item.detail),
-        el("ul", { class: "sources" }, item.sources.map((s) =>
-          el("li", {}, el("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.title), ` · ${s.published}`))),
-        el("p", { class: "note" }, verification)));
+
+    return el("div", { class: "more-body" },
+      facts,
+      el("p", {}, item.detail),
+      el("ul", { class: "sources" }, item.sources.map((s) =>
+        el("li", {}, el("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.title), ` · ${s.published}`))),
+      el("p", { class: "note" }, verification));
   }
 
-  function sectionHead(id, title, countText, extra) {
+  function closeModal() {
+    if (!modalRoot || modalRoot.hidden) return;
+    modalRoot.classList.remove("is-open");
+    modalRoot.setAttribute("aria-hidden", "true");
+    modalRoot.hidden = true;
+    modalRoot.innerHTML = "";
+    if (lastTrigger) {
+      lastTrigger.focus();
+      lastTrigger = null;
+    }
+  }
+
+  function openModal(item, triggerEl) {
+    if (!modalRoot) return;
+    lastTrigger = triggerEl || document.activeElement;
+    const kicker = item.section === "llm"
+      ? `${orgOf(item)} · ${shortDate(item.sources[0].published)}`
+      : `${item.hiring.company} · ${item.hiring.type} (~${shortDate(item.hiring.deadline)})`;
+
+    const closeBtn = el("button", {
+      type: "button",
+      class: "modal-close",
+      "aria-label": "닫기",
+      onclick: closeModal,
+    }, "✕");
+
+    const sheet = el("div", {
+      class: "modal-sheet",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-labelledby": "modal-item-title",
+    },
+    el("div", { class: "modal-top" },
+      el("div", {},
+        el("p", { class: "modal-kicker" }, kicker),
+        el("h3", { class: "modal-title", id: "modal-item-title" }, item.title)),
+      closeBtn),
+    points(item),
+    buildDetailContent(item));
+
+    modalRoot.innerHTML = "";
+    modalRoot.append(sheet);
+    modalRoot.hidden = false;
+    modalRoot.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => {
+      modalRoot.classList.add("is-open");
+      closeBtn.focus();
+    });
+  }
+
+  if (modalRoot) {
+    modalRoot.addEventListener("click", (e) => {
+      if (e.target === modalRoot) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modalRoot.hidden) closeModal();
+    });
+  }
+
+  // ---------- 공통 조각 ----------
+
+  function points(item) {
+    return el("ul", { class: "points" }, item.card.map((line) => el("li", {}, line)));
+  }
+
+  function detailTrigger(item) {
+    const btn = el("button", {
+      type: "button",
+      class: "detail-btn",
+      onclick: (e) => openModal(item, e.currentTarget),
+    }, `자세히 · 원문 ${item.sources.length} ↗`);
+    return el("div", { class: "card-actions" }, btn);
+  }
+
+  function sectionHead(id, kicker, title, countText, extra) {
     return el("div", { class: "section-head" },
-      el("div", { class: "title" }, el("h2", { id: `${id}-title` }, title), el("p", { class: "count" }, countText)),
+      el("div", { class: "title" },
+        el("p", { class: "section-kicker" }, kicker),
+        el("div", { class: "section-title-row" },
+          el("h2", { id: `${id}-title` }, title),
+          el("p", { class: "count" }, countText))),
       extra);
   }
 
-  // ---------- 오늘의 한 줄 + 실행 지표 ----------
+  // ---------- 첫 화면: 시선을 사로잡는 Hero Stage ----------
 
-  function hero() {
-    const latest = data.days[data.days.length - 1];
-    const run = data.last_run;
-    const todayCount = latest && latest.date === today ? latest.items.length : 0;
-    const parts = [];
+  function heroCoffeeEmblem() {
+    const ns = "http://www.w3.org/2000/svg";
+    const s = document.createElementNS(ns, "svg");
+    s.setAttribute("class", "hero-coffee-svg");
+    s.setAttribute("viewBox", "0 0 64 76");
+    s.setAttribute("fill", "none");
+    s.setAttribute("aria-hidden", "true");
 
-    if (latest && latest.items.some((i) => i.id === latest.headline.item_id)) {
-      const ago = daysBetween(latest.date, today);
-      parts.push(el("section", { class: "headline", "aria-label": "오늘의 한 줄" },
-        el("p", { class: "eyebrow" }, `${longDate(latest.date)} · ${ago > 0 ? `${ago}일 전 한 줄` : "오늘의 한 줄"}`),
-        el("p", { class: "headline-text" }, latest.headline.text),
-        el("a", { href: `#item-${latest.headline.item_id}` }, "카드로 보기 →")));
-    }
-    if (run) {
-      parts.push(el("dl", { class: "stats", "aria-label": "실행 지표" },
-        [["오늘 공개", `${todayCount}건`], ["수집 후보", `${run.candidates}건`],
-          ["검증 수정", `${run.verification_edits}곳`], ["마지막 실행", shortDate(run.date)]]
-          .map(([k, v]) => el("div", {}, el("dt", {}, k), el("dd", {}, v)))));
-    }
-    return parts.length ? el("div", { class: "hero" }, parts) : null;
+    s.innerHTML = `
+      <defs>
+        <linearGradient id="crema-disc" x1="12" y1="20" x2="52" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#f7d4a8" />
+          <stop offset="100%" stop-color="#e0a668" />
+        </linearGradient>
+        <linearGradient id="steam-grad" x1="32" y1="2" x2="32" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#f7d4a8" stop-opacity="0" />
+          <stop offset="45%" stop-color="#f7d4a8" stop-opacity="0.9" />
+          <stop offset="100%" stop-color="#e8b57a" stop-opacity="0.2" />
+        </linearGradient>
+      </defs>
+      <!-- 모락모락 피어오르는 커피 김 3줄기 -->
+      <g class="steam-group">
+        <path class="steam-wisp wisp-1" d="M24 26 C21 20, 27 15, 24 8" stroke="url(#steam-grad)" stroke-width="2.2" stroke-linecap="round" />
+        <path class="steam-wisp wisp-2" d="M32 24 C29 17, 35 11, 32 3" stroke="url(#steam-grad)" stroke-width="2.4" stroke-linecap="round" />
+        <path class="steam-wisp wisp-3" d="M40 26 C37 20, 43 15, 40 8" stroke="url(#steam-grad)" stroke-width="2.2" stroke-linecap="round" />
+      </g>
+      <!-- 반전된 크레마 골드 메달리온 -->
+      <circle class="emblem-disc" cx="32" cy="48" r="22" fill="url(#crema-disc)" />
+      <!-- 다크 에스프레소 잔 아이콘 (색상 반전) -->
+      <g stroke="#120d0a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 41h17v6.5a6.5 6.5 0 0 1-6.5 6.5h-4a6.5 6.5 0 0 1-6.5-6.5z" fill="#120d0a" fill-opacity="0.14" />
+        <path d="M38 43h2.2a3.2 3.2 0 0 1 0 6.4H38" />
+        <path d="M20 57.5h19" />
+      </g>
+    `;
+    return el("div", { class: "hero-emblem-wrap", "aria-hidden": "true" }, s);
   }
 
-  // ---------- LLM: 넘기는 카드 ----------
+  function heroStage() {
+    const latest = data.days[data.days.length - 1];
+    if (!latest) return null;
+
+    const headlineItem = latest.items.find((i) => i.id === latest.headline.item_id) || latest.items[0];
+    if (!headlineItem) return null;
+
+    const ago = daysBetween(latest.date, today);
+    const badgeLabel = `${longDate(latest.date)} · ${ago > 0 ? `${ago}일 전 헤드라인` : "TODAY'S HEADLINE"}`;
+    const leadLine = headlineItem.card && headlineItem.card[0] ? headlineItem.card[0] : "";
+
+    return el("section", { class: "hero-stage", "aria-label": "오늘의 한 줄" },
+      heroCoffeeEmblem(),
+      el("div", { class: "hero-badge-row" },
+        el("span", { class: "pulse-dot", "aria-hidden": "true" }),
+        el("p", { class: "eyebrow" }, badgeLabel)),
+      el("div", { class: "headline" },
+        el("h2", { class: "headline-text" }, latest.headline.text),
+        leadLine && el("p", { class: "hero-lead" }, leadLine),
+        el("div", { class: "hero-actions" },
+          el("button", {
+            type: "button",
+            class: "btn-primary",
+            onclick: (e) => openModal({ ...headlineItem, date: latest.date }, e.currentTarget),
+          }, "헤드라인 브리핑 열기 ↗"),
+          el("a", { class: "btn-secondary", href: "#showcase-deck" }, "전체 브리핑 탐색 ↓"))),
+      el("div", { class: "scroll-cue", "aria-hidden": "true" },
+        el("span", {}, "SCROLL TO EXPAND"),
+        el("span", { class: "scroll-cue-line" })));
+  }
+
+  // ---------- LLM: 넘기는 카드 + 도트 인디케이터 ----------
 
   function llmSection() {
     const rows = items
@@ -151,32 +275,57 @@
 
     if (!rows.length) {
       return el("section", { class: "section", id: "section-llm", "aria-labelledby": "llm-title" },
-        sectionHead("llm", title, ""), el("p", { class: "empty" }, "최근 7일간 새 소식 없음"));
+        sectionHead("llm", "GLOBAL AI LABS", title, ""),
+        el("p", { class: "empty" }, "최근 7일간 새 소식 없음"));
     }
 
-    const rail = el("div", { class: "rail", tabindex: "0", "aria-label": `${title} 카드, 옆으로 넘기기` },
-      rows.map(({ item, ago }, n) => el("article", {
-        class: `slide${ago > 0 ? " past" : ""}`, id: `item-${item.id}`, "data-section": "llm",
-        "data-state": ago > 0 ? `${ago}일 전` : "오늘",
+    const slides = rows.map(({ item, ago }, n) => el("article", {
+      class: `slide reveal-card${ago > 0 ? " past" : ""}`,
+      id: `item-${item.id}`,
+      "data-section": "llm",
+      "data-state": ago > 0 ? `${ago}일 전` : "오늘",
+    },
+    el("div", { class: "slide-top" },
+      el("div", { class: "slide-meta" },
+        el("p", { class: "org-pill" }, `${orgOf(item)} · ${shortDate(item.sources[0].published)}`),
+        el("p", {}, ago > 0
+          ? el("span", { class: "badge" }, `${ago}일 전`)
+          : `${String(n + 1).padStart(2, "0")} / ${String(rows.length).padStart(2, "0")}`)),
+      el("h3", {}, item.title)),
+    el("div", { class: "slide-body" }, points(item), detailTrigger(item))));
+
+    const rail = el("div", { class: "rail", tabindex: "0", "aria-label": `${title} 카드, 옆으로 넘기기` }, slides);
+
+    const dots = rows.map((_, idx) => el("button", {
+      type: "button",
+      class: `rail-dot${idx === 0 ? " active" : ""}`,
+      "aria-label": `${idx + 1}번째 카드로 이동`,
+      onclick: () => {
+        const target = slides[idx];
+        if (target) rail.scrollTo({ left: target.offsetLeft - rail.offsetLeft, behavior: "smooth" });
       },
-      el("div", { class: "slide-top" },
-        el("div", { class: "slide-meta" },
-          el("p", {}, `${orgOf(item)} · ${shortDate(item.sources[0].published)}`),
-          el("p", {}, ago > 0 ? el("span", { class: "badge" }, `${ago}일 전`) : `${String(n + 1).padStart(2, "0")} / ${String(rows.length).padStart(2, "0")}`)),
-        el("h3", {}, item.title)),
-      el("div", { class: "slide-body" }, points(item), more(item)))));
+    }));
 
     const prev = el("button", { type: "button", class: "round", "aria-label": "이전 카드" }, svg("M15 6l-6 6 6 6"));
     const next = el("button", { type: "button", class: "round", "aria-label": "다음 카드" }, svg("M9 6l6 6-6 6"));
+
     const step = (dir) => {
       const slide = rail.querySelector(".slide");
       const gap = parseFloat(getComputedStyle(rail).columnGap) || 0;
       rail.scrollBy({ left: dir * (slide.offsetWidth + gap), behavior: "smooth" });
     };
+
     const sync = () => {
       prev.disabled = rail.scrollLeft <= 2;
       next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+      const slide = slides[0];
+      if (slide) {
+        const gap = parseFloat(getComputedStyle(rail).columnGap) || 14;
+        const idx = Math.min(rows.length - 1, Math.max(0, Math.round(rail.scrollLeft / (slide.offsetWidth + gap))));
+        dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+      }
     };
+
     prev.addEventListener("click", () => step(-1));
     next.addEventListener("click", () => step(1));
     rail.addEventListener("scroll", sync, { passive: true });
@@ -185,8 +334,11 @@
 
     const countText = todayCount ? `오늘 ${todayCount}건 · 최근 7일 ${rows.length}건` : `최근 7일 ${rows.length}건`;
     return el("section", { class: "section", id: "section-llm", "aria-labelledby": "llm-title" },
-      sectionHead("llm", title, countText, el("div", { class: "nav-buttons" }, prev, next)),
-      rail);
+      sectionHead("llm", "GLOBAL AI LABS", title, countText, el("div", { class: "nav-buttons" }, prev, next)),
+      rail,
+      rows.length > 1 && el("div", { class: "rail-footer" },
+        el("div", { class: "rail-dots", role: "tablist", "aria-label": "카드 순서" }, dots),
+        el("p", { class: "swipe-hint" }, `${rows.length}장의 카드 · 좌우로 스와이프`)));
   }
 
   // ---------- 채용·해커톤: 마감 순 ----------
@@ -201,7 +353,8 @@
 
     if (!rows.length) {
       return el("section", { class: "section", id: "section-hiring", "aria-labelledby": "hiring-title" },
-        sectionHead("hiring", title, ""), el("p", { class: "empty" }, "진행 중인 채용·해커톤 소식 없음"));
+        sectionHead("hiring", "OPPORTUNITIES & HACKATHONS", title, ""),
+        el("p", { class: "empty" }, "진행 중인 채용·해커톤 소식 없음"));
     }
 
     const list = el("div", { class: "deadlines" }, rows.map(({ item, left }) => {
@@ -209,23 +362,182 @@
       const urgent = left <= URGENT_DAYS;
       const state = isNew ? "신규" : urgent ? "마감 임박" : "진행 중";
       return el("article", {
-        class: `job${urgent ? " urgent" : ""}`, id: `item-${item.id}`, "data-section": "hiring", "data-state": state,
+        class: `job reveal-card${urgent ? " urgent" : ""}`,
+        id: `item-${item.id}`,
+        "data-section": "hiring",
+        "data-state": state,
       },
       el("div", { class: "dday", "aria-label": `마감 ${left === 0 ? "오늘" : `${left}일 남음`}` },
-        el("span", { "aria-hidden": "true" }, "마감"),
+        el("span", { "aria-hidden": "true" }, urgent ? "임박" : "마감"),
         el("strong", { "aria-hidden": "true" }, left === 0 ? "D-DAY" : `D-${left}`)),
       el("div", { class: "job-body" },
         el("p", { class: "job-meta" },
-          el("span", { class: isNew ? "new" : urgent ? "soon" : "" }, state),
-          ` · ${item.hiring.type} · ${shortDate(item.hiring.deadline)} 마감`),
+          el("span", { class: `state-pill${isNew ? " new" : urgent ? " soon" : ""}` }, state),
+          el("span", {}, `${item.hiring.company} · ${item.hiring.type} · ${shortDate(item.hiring.deadline)} 마감`)),
         el("h3", {}, item.title),
         points(item),
-        more(item)));
+        detailTrigger(item)));
     }));
 
     return el("section", { class: "section", id: "section-hiring", "aria-labelledby": "hiring-title" },
-      sectionHead("hiring", title, `마감 순 · 진행 중 ${rows.length}건`),
+      sectionHead("hiring", "OPPORTUNITIES & HACKATHONS", title, `마감 순 · 진행 중 ${rows.length}건`),
       list);
+  }
+
+  // ---------- 하단 파이프라인 지표 (첫 화면에서 하단으로 분리) ----------
+
+  function telemetrySection() {
+    const run = data.last_run;
+    if (!run) return null;
+    const latest = data.days[data.days.length - 1];
+    const todayCount = latest && latest.date === today ? latest.items.length : 0;
+
+    return el("section", { class: "telemetry-section reveal-card", id: "section-telemetry", "aria-label": "실행 지표" },
+      el("div", { class: "telemetry-head" },
+        el("div", {},
+          el("p", { class: "section-kicker" }, "AUTONOMOUS PIPELINE TELEMETRY"),
+          el("h2", {}, "오늘의 AI 수집·검증 파이프라인 지표")),
+        el("p", { class: "telemetry-sub" }, "매일 아침 07:23 KST 자동 수집 · 원문 대조 검증 후 공개")),
+      el("dl", { class: "stats" },
+        [["오늘 공개", `${todayCount}건`], ["수집 후보", `${run.candidates}건`],
+          ["검증 수정", `${run.verification_edits}곳`], ["마지막 실행", shortDate(run.date)]]
+          .map(([k, v]) => el("div", {}, el("dt", {}, k), el("dd", {}, v)))));
+  }
+
+  // ---------- 스크롤 연동 스케일업 & 인터랙티브 배경 ----------
+
+  function initScrollInteractions(showcaseEl) {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealCards = document.querySelectorAll(".reveal-card");
+
+    if (reduced) {
+      revealCards.forEach((c) => c.classList.add("is-visible"));
+      if (showcaseEl) {
+        showcaseEl.style.setProperty("--deck-scale", "1");
+        showcaseEl.style.setProperty("--deck-y", "0px");
+      }
+      return;
+    }
+
+    // Google 스토어/Antigravity 스타일: 스크롤 시 하단 컨테이너가 0.92 → 1.0으로 확대
+    const updateDeckScale = () => {
+      if (!showcaseEl) return;
+      const rect = showcaseEl.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      // 화면 하단(vh * 0.92)에서 화면 상단(vh * 0.28)으로 올라오는 동안 0 → 1 진행
+      const start = vh * 0.92;
+      const end = vh * 0.25;
+      const raw = (start - rect.top) / (start - end);
+      const progress = Math.min(1, Math.max(0, raw));
+      const scale = 0.92 + 0.08 * progress;
+      const y = (1 - progress) * 26;
+      showcaseEl.style.setProperty("--deck-scale", scale.toFixed(4));
+      showcaseEl.style.setProperty("--deck-y", `${y.toFixed(1)}px`);
+    };
+
+    window.addEventListener("scroll", updateDeckScale, { passive: true });
+    window.addEventListener("resize", updateDeckScale);
+    requestAnimationFrame(updateDeckScale);
+
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
+        }
+      }, { threshold: 0.12, rootMargin: "0px 0px -24px 0px" });
+      revealCards.forEach((c) => io.observe(c));
+    } else {
+      revealCards.forEach((c) => c.classList.add("is-visible"));
+    }
+  }
+
+  function initAmbientCanvas() {
+    const canvas = document.getElementById("bg-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let width = 0;
+    let height = 0;
+    let dots = [];
+    const mouse = { x: -1000, y: -1000, active: false };
+
+    function buildGrid() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const spacing = width < 720 ? 44 : 52;
+      dots = [];
+      for (let x = spacing / 2; x < width; x += spacing) {
+        for (let y = spacing / 2; y < height; y += spacing) {
+          dots.push({ ox: x, oy: y, x, y, phase: (x * 0.015) + (y * 0.015) });
+        }
+      }
+    }
+
+    window.addEventListener("pointermove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+    }, { passive: true });
+
+    window.addEventListener("pointerleave", () => {
+      mouse.active = false;
+    });
+
+    window.addEventListener("resize", buildGrid);
+    buildGrid();
+
+    function draw(t) {
+      ctx.clearRect(0, 0, width, height);
+      const time = (t || 0) * 0.0012;
+      const radius = 170;
+
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i];
+        let tx = d.ox + Math.sin(time + d.phase) * 2.2;
+        let ty = d.oy + Math.cos(time + d.phase) * 2.2;
+        let alpha = 0.16;
+        let size = 1.35;
+
+        if (mouse.active) {
+          const dx = tx - mouse.x;
+          const dy = ty - mouse.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < radius && dist > 0.1) {
+            const force = (1 - dist / radius);
+            // Antigravity-style subtle repulsion + warm Crema glow
+            tx += (dx / dist) * force * 16;
+            ty += (dy / dist) * force * 16;
+            alpha = 0.16 + force * 0.58;
+            size = 1.35 + force * 1.6;
+          }
+        }
+
+        d.x += (tx - d.x) * 0.18;
+        d.y += (ty - d.y) * 0.18;
+
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(232, 181, 122, ${alpha.toFixed(3)})`;
+        ctx.fill();
+      }
+
+      if (!reduced) {
+        requestAnimationFrame(draw);
+      }
+    }
+
+    requestAnimationFrame(draw);
   }
 
   // ---------- 그리기 ----------
@@ -235,8 +547,17 @@
   if (!items.length) {
     app.append(el("p", { class: "empty" }, "아직 공개된 소식이 없습니다."));
   } else {
-    app.append(hero() || "", llmSection(), hiringSection());
+    const heroEl = heroStage();
+    const showcaseEl = el("div", { class: "showcase-shell", id: "showcase-deck" },
+      llmSection(),
+      hiringSection());
+    const telemetryEl = telemetrySection();
+
+    app.append(heroEl || "", showcaseEl, telemetryEl || "");
+    initScrollInteractions(showcaseEl);
   }
+
+  initAmbientCanvas();
 
   const run = data.last_run;
   document.getElementById("run-info").append(
