@@ -1,0 +1,19 @@
+# 모든 섹션에 공통으로 적용되는 기준. scripts/validate.py가 읽는다.
+
+timezone: Asia/Seoul
+
+# 최근 처리 기록(색인)으로 보는 기간
+index_days: 7
+
+text:
+  title_max_chars: 60
+  card_lines_min: 2
+  card_lines_max: 3
+  card_line_max_chars: 80
+  detail_max_chars: 600
+  headline_max_chars: 80
+
+quote:
+  # 따옴표(“ ” 또는 " ") 안의 글자 수
+  max_chars: 40
+  max_per_item: 1

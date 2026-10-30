@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-30",
+  "headline": {
+    "item_id": "2026-10-30-01",
+    "text": "예시은행, 코딩테스트 대신 AI 과제 전형 도입"
+  },
+  "items": [
+    {
+      "id": "2026-10-30-01",
+      "section": "hiring",
+      "event_key": "예시은행 AI 과제 전형 도입",
+      "title": "예시은행, AI 과제 전형 도입",
+      "card": [
+        "예시은행, AI 과제 전형 도입 핵심 1",
+        "예시은행, AI 과제 전형 도입 핵심 2"
+      ],
+      "detail": "예시은행, AI 과제 전형 도입에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시은행, AI 과제 전형 도입 원문",
+          "url": "https://example.com/hiring/ai-task",
+          "published": "2026-10-29"
+        }
+      ],
+      "verification": {
+        "status": "pass",
+        "edits": 0
+      },
+      "hiring": {
+        "company": "예시은행",
+        "type": "AI 과제",
+        "targets": [
+          "신입"
+        ],
+        "eligibility": "2027년 2월 졸업 예정자",
+        "apply_start": "2026-10-29",
+        "deadline": "2026-11-02"
+      }
+    },
+    {
+      "id": "2026-10-30-02",
+      "section": "llm",
+      "event_key": "예시랩 샘플-1 가격 인하",
+      "title": "예시랩, 샘플-1 가격 인하",
+      "card": [
+        "예시랩, 샘플-1 가격 인하 핵심 1",
+        "예시랩, 샘플-1 가격 인하 핵심 2"
+      ],
+      "detail": "예시랩, 샘플-1 가격 인하에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시랩, 샘플-1 가격 인하 원문",
+          "url": "https://example.com/news/sample-1-price",
+          "published": "2026-10-30"
+        }
+      ],
+      "verification": {
+        "status": "pass",
+        "edits": 0
+      }
+    }
+  ]
+}

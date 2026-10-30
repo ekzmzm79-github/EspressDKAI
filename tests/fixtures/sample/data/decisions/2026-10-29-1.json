@@ -1,0 +1,14 @@
+{
+  "decided_at": "2026-10-29T08:10:00+09:00",
+  "via": "drop",
+  "pr": 7,
+  "items": [
+    {
+      "item_id": "2026-10-29-02",
+      "status": "rejected",
+      "event_key": "예시AI 루머성 발표",
+      "title": "예시AI 차기 모델 소문",
+      "url": "https://example.com/news/rumor"
+    }
+  ]
+}

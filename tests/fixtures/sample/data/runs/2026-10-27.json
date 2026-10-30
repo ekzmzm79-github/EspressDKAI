@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-27",
+  "started_at": "2026-10-27T07:24:10+09:00",
+  "status": "empty",
+  "sections": {
+    "llm": {
+      "candidates": 1,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "예시랩 행사 예고",
+          "url": "https://example.com/news/event-teaser",
+          "reason": "발표 아닌 예고"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 0,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": []
+    }
+  }
+}

@@ -1,0 +1,26 @@
+id: hiring
+title: AI 채용·해커톤
+public: true
+max_items: 5
+
+# 새 항목은 최근 7일 안에 나온 소식. 공개된 항목은 마감일까지 화면에 남는다
+window:
+  days: 7
+keep_until_deadline: true
+
+types: [AI 과제, AI 면접, 해커톤, 공모전, 기타]
+targets: [신입, 경력]
+
+search_keywords:
+  - AI 역량평가
+  - 코딩테스트 폐지
+  - 채용연계 해커톤
+  - AI 네이티브 채용
+  - 패스트트랙 채용
+
+sources:
+  - name: 뉴스 검색
+    role: primary       # search_keywords로 검색
+  - name: 기업 공식 뉴스룸
+    role: verify        # 키워드로 잡힌 소식의 원문 확인
+  # 공모전·대외활동 플랫폼은 M1에서 텍스트로 정보가 잘 나오는 곳을 골라 추가한다

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run.schema.json",
+  "title": "실행 지표 (data/runs/YYYY-MM-DD.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["date", "started_at", "status", "sections"],
+  "properties": {
+    "date": { "type": "string", "format": "date" },
+    "started_at": { "description": "KST 오프셋 포함 ISO 8601", "type": "string", "format": "date-time" },
+    "status": {
+      "description": "published: 공개할 항목 있음 / empty: 두 섹션 모두 없음 / failed: 실행 실패",
+      "enum": ["published", "empty", "failed"]
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["llm", "hiring"],
+      "properties": {
+        "llm": { "$ref": "#/$defs/section" },
+        "hiring": { "$ref": "#/$defs/section" }
+      }
+    },
+    "note": { "type": "string" }
+  },
+  "$defs": {
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidates", "passed", "skipped", "verification_edits"],
+      "properties": {
+        "candidates": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "verification_edits": { "type": "integer", "minimum": 0 },
+        "skipped": {
+          "description": "AI가 기준 미달로 뺀 후보. 다음 날 중복 판단에 쓰인다",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_key", "url", "reason"],
+            "properties": {
+              "event_key": { "type": "string", "minLength": 1 },
+              "title": { "type": "string" },
+              "url": { "type": "string", "pattern": "^https?://\\S+$" },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "over_max_reason": { "description": "권장 최대치를 넘긴 이유", "type": "string" }
+      }
+    }
+  }
+}
