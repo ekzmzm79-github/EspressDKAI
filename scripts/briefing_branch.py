@@ -4,9 +4,10 @@
     python scripts/briefing_branch.py publish             # 작성 후: 검사 → 커밋 → 푸시 → PR 생성·갱신
     python scripts/briefing_branch.py check-paths         # PR이 data/days, data/runs 밖을 고쳤는지
 
-열린 브리핑 PR이 있으면 그 브랜치에 이어 쓰고(계획서 C2), 없으면 main에서 새로 만든다.
-두 섹션 모두 비는 날도 같은 브랜치에 runs 파일만 올린다. data/runs만 바뀐 PR은
-auto-merge-log 워크플로가 자동 Merge한다.
+열린 브리핑 PR이 있으면 그 브랜치에 이어 쓰고(계획서 C2), 없으면 main에서
+`claude/briefing-<KST 날짜>` 브랜치를 새로 만든다. 브랜치를 덮어쓰지 않으므로
+강제 푸시가 필요 없다. 두 섹션 모두 비는 날도 같은 브랜치에 runs 파일만 올린다.
+data/runs만 바뀐 PR은 auto-merge-log 워크플로가 자동 Merge한다.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import github_pr
 import pr_summary
 import validate
 
-BRANCH = os.environ.get("BRIEFING_BRANCH", "claude/briefing")
+PREFIX = os.environ.get("BRIEFING_PREFIX", "claude/briefing-")
 BASE = os.environ.get("BRIEFING_BASE", "main")
 ALLOWED = ("data/days/", "data/runs/")
 
@@ -33,12 +34,23 @@ def git(*args: str, check: bool = True) -> str:
     return out.stdout.strip()
 
 
-def fetch(branch: str) -> bool:
-    """원격 브랜치를 origin/<branch>로 받는다. 없으면 False."""
-    if not git("ls-remote", "--heads", "origin", branch):
-        return False
+def fetch(branch: str) -> None:
     git("fetch", "-q", "origin", f"+refs/heads/{branch}:refs/remotes/origin/{branch}")
-    return True
+
+
+def remote_branches() -> set[str]:
+    refs = git("ls-remote", "--heads", "origin", f"{PREFIX}*").splitlines()
+    return {line.split("refs/heads/", 1)[1] for line in refs}
+
+
+def new_branch_name() -> str:
+    """claude/briefing-<오늘>. 같은 날 닫힌 PR의 브랜치가 남아 있으면 -2, -3…"""
+    name = f"{PREFIX}{common.today_kst()}"
+    taken = remote_branches()
+    n = 1
+    while (candidate := name if n == 1 else f"{name}-{n}") in taken:
+        n += 1
+    return candidate
 
 
 def changed_paths(base: str = f"origin/{BASE}") -> list[str]:
@@ -60,26 +72,28 @@ def prepare() -> None:
     if git("status", "--porcelain"):
         sys.exit("작업 트리가 깨끗하지 않다. 정리한 뒤 다시 실행한다.")
     fetch(BASE)
-    pr = github_pr.find_open_pr(BRANCH)
+    pr = github_pr.find_open_pr(PREFIX)
     if pr:
-        fetch(BRANCH)
-        git("checkout", "-q", "-B", BRANCH, f"origin/{BRANCH}")
+        branch = pr["head"]["ref"]
+        fetch(branch)
+        git("checkout", "-q", "-B", branch, f"origin/{branch}")
         # 그사이 main에 들어온 것(거절 기록, 코드 변경)을 받는다. 데이터는 날짜별 파일이라 충돌하지 않는다
         if subprocess.run(["git", "merge", "-q", "--no-edit", f"origin/{BASE}"], cwd=common.ROOT, capture_output=True).returncode:
             git("merge", "--abort", check=False)
-            sys.exit(f"main을 {BRANCH}에 합치다 충돌. 사람이 확인해야 한다 (PR #{pr['number']})")
+            sys.exit(f"{BASE}를 {branch}에 합치다 충돌. 사람이 확인해야 한다 (PR #{pr['number']})")
         dates = pending_dates(changed_paths())
-        print(f"이어 쓰기: PR #{pr['number']} · 대기 중인 날짜 {', '.join(dates) or '없음'}")
+        print(f"이어 쓰기: PR #{pr['number']} ({branch}) · 대기 중인 날짜 {', '.join(dates) or '없음'}")
     else:
-        git("checkout", "-q", "-B", BRANCH, f"origin/{BASE}")
-        print(f"새 브리핑: {BRANCH}를 main에서 시작")
+        branch = new_branch_name()
+        git("checkout", "-q", "-B", branch, f"origin/{BASE}")
+        print(f"새 브리핑: {branch}를 {BASE}에서 시작")
     print(f"오늘(KST): {common.today_kst()}")
 
 
 def publish() -> None:
-    current = git("rev-parse", "--abbrev-ref", "HEAD")
-    if current != BRANCH:
-        sys.exit(f"{BRANCH} 브랜치가 아니다 (지금 {current}). prepare를 먼저 실행한다.")
+    branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    if not branch.startswith(PREFIX):
+        sys.exit(f"브리핑 브랜치가 아니다 (지금 {branch}). prepare를 먼저 실행한다.")
 
     paths = changed_paths()
     if bad := disallowed(paths):
@@ -98,18 +112,16 @@ def publish() -> None:
     git("add", "data/days", "data/runs")
     if git("diff", "--cached", "--name-only"):
         git("commit", "-q", "-m", f"briefing: {', '.join(dates)}")
-
-    pr = github_pr.find_open_pr(BRANCH)
-    # 열린 PR이 없으면 원격에 남은 옛 브랜치를 main 기준 새 브랜치로 덮는다
-    git("push", "-q", *([] if pr else ["--force"]), "origin", f"{BRANCH}:{BRANCH}")
+    git("push", "-q", "origin", f"{branch}:{branch}")
 
     body = pr_summary.summarize(dates, common.DATA_DIR)
     title = pr_summary.title(dates)
-    if pr:
+    pr = github_pr.find_open_pr(PREFIX)
+    if pr and pr["head"]["ref"] == branch:
         pr = github_pr.update_pr(pr["number"], title=title, body=body)
         action = "갱신"
     else:
-        pr = github_pr.create_pr(BRANCH, title, body, BASE)
+        pr = github_pr.create_pr(branch, title, body, BASE)
         action = "생성"
     print(f"PR {action}: {pr['html_url']} · 날짜 {', '.join(dates)}")
 

@@ -20,11 +20,12 @@ class FakeGitHub:
         self.pr = None
         self.calls = []
 
-    def find_open_pr(self, branch):
-        return self.pr
+    def find_open_pr(self, prefix):
+        return self.pr if self.pr and self.pr["head"]["ref"].startswith(prefix) else None
 
     def create_pr(self, branch, title, body, base="main"):
-        self.pr = {"number": 1, "html_url": "https://example.com/pr/1", "title": title, "body": body}
+        self.pr = {"number": 1, "html_url": "https://example.com/pr/1", "title": title, "body": body,
+                   "head": {"ref": branch}}
         self.calls.append("create")
         return self.pr
 
@@ -78,7 +79,7 @@ def test_new_then_continue(repo, capsys):
     run(work, "add", "-A")
     run(work, "commit", "-q", "-m", "decision")
     run(work, "push", "-q", "origin", "main")
-    run(work, "branch", "-q", "-D", briefing_branch.BRANCH)  # 새 컨테이너처럼 로컬 브랜치 없음
+    run(work, "branch", "-q", "-D", gh.pr["head"]["ref"])  # 새 컨테이너처럼 로컬 브랜치 없음
 
     briefing_branch.prepare()
     out = capsys.readouterr().out
@@ -90,25 +91,26 @@ def test_new_then_continue(repo, capsys):
     assert gh.pr["title"] == "브리핑 2026-10-28 ~ 2026-10-29 (2일)"
     assert "## 2026-10-28" in gh.pr["body"] and "## 2026-10-29" in gh.pr["body"]
 
-    remote_files = run(origin, "ls-tree", "-r", "--name-only", briefing_branch.BRANCH)
+    remote_files = run(origin, "ls-tree", "-r", "--name-only", gh.pr["head"]["ref"])
     assert "data/days/2026-10-29.json" in remote_files
 
 
-def test_stale_remote_branch_is_replaced(repo):
+def test_closed_pr_branch_is_not_reused(repo):
+    """닫힌 PR의 브랜치가 원격에 남아 있으면 덮어쓰지 않고 새 이름을 쓴다(강제 푸시 없음)."""
     work, origin, gh = repo
-    # 닫힌 PR의 브랜치가 원격에 남아 있다
-    run(work, "checkout", "-q", "-b", briefing_branch.BRANCH)
+    today = briefing_branch.PREFIX + str(common.today_kst())
+    run(work, "checkout", "-q", "-b", today)
     (work / "data" / "days" / "old.txt").write_text("old")
     run(work, "add", "-A")
     run(work, "commit", "-q", "-m", "old")
-    run(work, "push", "-q", "origin", briefing_branch.BRANCH)
+    run(work, "push", "-q", "origin", today)
     run(work, "checkout", "-q", "main")
 
     briefing_branch.prepare()
     add_day(work, "2026-10-28")
     briefing_branch.publish()
-    remote_files = run(origin, "ls-tree", "-r", "--name-only", briefing_branch.BRANCH)
-    assert "data/days/old.txt" not in remote_files
+    assert gh.pr["head"]["ref"] == f"{today}-2"
+    assert "data/days/old.txt" in run(origin, "ls-tree", "-r", "--name-only", today)  # 옛 브랜치는 그대로
 
 
 def test_publish_rejects_paths_outside_data(repo):

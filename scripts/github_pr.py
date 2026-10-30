@@ -39,10 +39,10 @@ def api(path: str, method: str = "GET", fields: dict | None = None) -> dict | li
     return json.loads(out.stdout) if out.stdout.strip() else {}
 
 
-def find_open_pr(branch: str) -> dict | None:
-    owner = repo().split("/")[0]
-    prs = api(f"pulls?state=open&head={owner}:{branch}")
-    return prs[0] if prs else None
+def find_open_pr(prefix: str) -> dict | None:
+    """head 브랜치 이름이 prefix로 시작하는 열린 PR 중 가장 오래된 것."""
+    prs = [p for p in api("pulls?state=open&per_page=100") if p["head"]["ref"].startswith(prefix)]
+    return min(prs, key=lambda p: p["number"]) if prs else None
 
 
 def create_pr(branch: str, title: str, body: str, base: str = "main") -> dict:
