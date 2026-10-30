@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-28",
+  "headline": {
+    "item_id": "2026-10-28-01",
+    "text": "예시랩, 새 모델 샘플-1 공개"
+  },
+  "items": [
+    {
+      "id": "2026-10-28-01",
+      "section": "llm",
+      "event_key": "예시랩 샘플-1 모델 공개",
+      "title": "예시랩, 샘플-1 모델 공개",
+      "card": [
+        "예시랩, 샘플-1 모델 공개 핵심 1",
+        "예시랩, 샘플-1 모델 공개 핵심 2"
+      ],
+      "detail": "예시랩, 샘플-1 모델 공개에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시랩, 샘플-1 모델 공개 원문",
+          "url": "https://example.com/news/sample-1",
+          "published": "2026-10-27"
+        }
+      ],
+      "verification": {
+        "status": "pass",
+        "edits": 0
+      }
+    },
+    {
+      "id": "2026-10-28-02",
+      "section": "llm",
+      "event_key": "예시AI 코딩 도구 업데이트",
+      "title": "예시AI 코딩 도구 업데이트",
+      "card": [
+        "예시AI 코딩 도구 업데이트 핵심 1",
+        "예시AI 코딩 도구 업데이트 핵심 2"
+      ],
+      "detail": "예시AI 코딩 도구 업데이트에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시AI 코딩 도구 업데이트 원문",
+          "url": "https://example.com/news/coder-update",
+          "published": "2026-10-28"
+        }
+      ],
+      "verification": {
+        "status": "pass",
+        "edits": 0
+      }
+    },
+    {
+      "id": "2026-10-28-03",
+      "section": "hiring",
+      "event_key": "예시전자 AI 해커톤 본선, 11월 11일",
+      "title": "예시전자 채용연계 AI 해커톤",
+      "card": [
+        "예시전자 채용연계 AI 해커톤 핵심 1",
+        "예시전자 채용연계 AI 해커톤 핵심 2"
+      ],
+      "detail": "예시전자 채용연계 AI 해커톤에 대한 상세 요약(샘플).",
+      "sources": [
+        {
+          "title": "예시전자 채용연계 AI 해커톤 원문",
+          "url": "https://example.com/hiring/hackathon",
+          "published": "2026-10-26"
+        }
+      ],
+      "verification": {
+        "status": "pass",
+        "edits": 0
+      },
+      "hiring": {
+        "company": "예시전자",
+        "type": "해커톤",
+        "targets": [
+          "신입",
+          "경력"
+        ],
+        "eligibility": "대학생 및 경력 3년 이하",
+        "deadline": "2026-11-11",
+        "benefit": "수상자 서류 면제"
+      }
+    }
+  ]
+}
