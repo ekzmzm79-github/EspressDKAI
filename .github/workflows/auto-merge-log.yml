@@ -1,0 +1,47 @@
+name: auto-merge-log
+
+# 두 섹션이 모두 빈 날처럼 data/runs만 바뀐 브리핑 PR은 사람 승인 없이 Merge한다.
+# 실행 기록이 main에 남아야 다음 날 색인과 지표에 반영된다.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-writes
+
+jobs:
+  merge:
+    if: startsWith(github.head_ref, 'claude/briefing-') && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: runs만 바뀌었는지
+        id: scope
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          others=$(git diff --name-only "origin/$BASE...HEAD" | grep -v '^data/runs/' || true)
+          if [ -z "$others" ]; then echo "only_runs=true" >> "$GITHUB_OUTPUT"; else echo "사람 승인 필요:"; echo "$others"; fi
+      - if: steps.scope.outputs.only_runs == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - if: steps.scope.outputs.only_runs == 'true'
+        run: pip install -r requirements.txt && python scripts/validate.py
+      - if: steps.scope.outputs.only_runs == 'true'
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - if: steps.scope.outputs.only_runs == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR/merge" -f merge_method=merge -f sha="$SHA" --jq .message

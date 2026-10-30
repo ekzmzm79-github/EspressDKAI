@@ -1,0 +1,78 @@
+name: drop
+
+# 브리핑 PR에 저장소 주인이 `/drop <항목 ID> ...` 코멘트를 달면 그 항목을 데이터에서 빼고 커밋한다.
+# 실행하는 스크립트는 main의 것이다. PR 브랜치의 코드는 실행하지 않는다.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: briefing-${{ github.event.issue.number }}
+
+jobs:
+  drop:
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/drop') &&
+      github.event.comment.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: PR 정보
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR: ${{ github.event.issue.number }}
+        run: |
+          ref=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq 'select(.state == "open") | .head.ref')
+          case "$ref" in
+            claude/briefing-*) echo "ref=$ref" >> "$GITHUB_OUTPUT" ;;
+            *) echo "열린 브리핑 PR이 아니다: '$ref'"; exit 1 ;;
+          esac
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: trusted
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.ref }}
+          path: pr
+          token: ${{ steps.app.outputs.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r trusted/requirements.txt
+      - name: 항목 제외
+        id: drop
+        env:
+          PR: ${{ github.event.issue.number }}
+          COMMENT: ${{ github.event.comment.body }}
+        run: |
+          set +e
+          python trusted/scripts/decisions.py drop "$PR" "$COMMENT" --data-dir pr/data > result.txt
+          code=$?
+          cat result.txt
+          { echo "result<<EOF"; cat result.txt; echo "EOF"; } >> "$GITHUB_OUTPUT"
+          exit $code
+      - name: 커밋·푸시
+        working-directory: pr
+        run: |
+          git config user.name "espressdkai-bot"
+          git config user.email "espressdkai-bot@users.noreply.github.com"
+          git add -A data
+          git commit -q -m "drop: $(head -1 ../result.txt)"
+          git push -q
+      - name: 결과 코멘트
+        if: always() && steps.drop.outputs.result != ''
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR: ${{ github.event.issue.number }}
+          RESULT: ${{ steps.drop.outputs.result }}
+        run: gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -f body="$RESULT" > /dev/null

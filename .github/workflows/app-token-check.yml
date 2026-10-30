@@ -1,10 +1,9 @@
 name: app-token-check
 
 # GitHub App 토큰이 발급되는지 점검 (APP_ID, APP_PRIVATE_KEY). 토큰 값은 출력하지 않는다.
+# 키를 바꾼 뒤 Actions 탭에서 수동 실행한다.
 on:
   workflow_dispatch:
-  pull_request:
-    paths: [".github/workflows/app-token-check.yml"]
 
 permissions:
   contents: read
