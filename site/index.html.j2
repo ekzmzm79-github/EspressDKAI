@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EspressDKAI · AI 동향 브리핑</title>
+  <meta name="description" content="매일 아침 LLM 개발사 소식과 국내 AI 채용·해커톤 소식을 카드 한 장으로.">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>EspressDKAI</h1>
+    <p class="sub">AI 동향 카드뉴스 브리핑</p>
+  </header>
+
+  <main id="app">
+    <noscript><p class="empty">이 페이지는 자바스크립트가 필요합니다. 데이터는 <a href="briefing.json">briefing.json</a>에서 볼 수 있습니다.</p></noscript>
+  </main>
+
+  <footer id="run-info" class="foot"></footer>
+
+  <script id="briefing-data" type="application/json">{{ data_json | safe }}</script>
+  <script src="static/app.js"></script>
+</body>
+</html>
