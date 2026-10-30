@@ -261,6 +261,8 @@
         if (i.section === "hiring" && i.hiring) return ago >= 0 && daysBetween(today, i.hiring.deadline) >= 0;
         return false;
       })
+      // 최신 소식부터 (days는 날짜 오름차순이라 그대로 자르면 가장 오래된 소식이 나온다)
+      .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id))
       .slice(0, 5);
     if (!previewItems.length) return null;
 
@@ -268,7 +270,7 @@
       previewItems.map((item, idx) => {
         const tag = item.section === "llm"
           ? orgOf(item)
-          : `D-${Math.max(0, daysBetween(today, item.hiring.deadline))}`;
+          : (daysBetween(today, item.hiring.deadline) === 0 ? "D-DAY" : `D-${daysBetween(today, item.hiring.deadline)}`);
         const shortTitle = item.title.length > 22 ? `${item.title.slice(0, 22)}…` : item.title;
         return el("a", {
           class: "topic-pill",
