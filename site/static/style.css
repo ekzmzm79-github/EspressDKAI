@@ -1,0 +1,93 @@
+/* 기본 구조만. 디자인은 M3에서 정한다 */
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text: #1c1917;
+  --muted: #78716c;
+  --border: #e7e5e4;
+  --accent: #b45309;
+  --new: #047857;
+  --urgent: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1917;
+    --surface: #292524;
+    --text: #f5f5f4;
+    --muted: #a8a29e;
+    --border: #44403c;
+    --accent: #f59e0b;
+    --new: #34d399;
+    --urgent: #f87171;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.top, main, .foot { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.top { padding-top: 24px; }
+.top h1 { margin: 0; font-size: 1.5rem; }
+.sub { margin: 0; color: var(--muted); }
+
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+.empty { color: var(--muted); }
+
+summary { cursor: pointer; }
+
+.headline {
+  margin: 20px 0;
+  padding: 16px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 8px;
+}
+.headline .label { font-weight: 700; }
+.headline a { display: block; margin-top: 6px; font-size: 1.1rem; font-weight: 600; color: var(--text); text-decoration: none; }
+
+.section h2 { font-size: 1.15rem; margin: 28px 0 12px; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.card h3 { margin: 6px 0 0; font-size: 1.02rem; line-height: 1.4; }
+
+.tag, .badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  margin-right: 6px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.badge.new { color: var(--new); border-color: currentColor; }
+.badge.urgent { color: var(--urgent); border-color: currentColor; }
+
+.points { padding-left: 18px; margin: 10px 0; }
+.detail summary { color: var(--accent); font-size: 0.9rem; }
+.sources { padding-left: 18px; font-size: 0.9rem; }
+
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 0.9rem; margin: 10px 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+.foot { padding-top: 32px; padding-bottom: 32px; color: var(--muted); font-size: 0.85rem; }
