@@ -41,10 +41,18 @@ def test_sample_payload():
 
 
 def test_duplicate_url_within_window_is_excluded(data):
-    write_day(data, "2026-10-31", [sample_item("2026-10-31-01", "https://example.com/news/sample-1", "2026-10-31")])
+    write_day(data, "2026-10-31", [sample_item("2026-10-31-01", "https://example.com/news/sample-1", "2026-10-27")])
     payload = build.collect(data, date(2026, 10, 31))
     assert "2026-10-31-01" not in ids(payload)
     assert payload["excluded"] == [{"item_id": "2026-10-31-01", "url": "https://example.com/news/sample-1", "first_seen": "2026-10-28"}]
+
+
+def test_same_page_new_entry_is_allowed(data):
+    """릴리스 노트처럼 한 주소에 쌓이는 페이지: 발행일이 다르면 다른 소식이다."""
+    write_day(data, "2026-10-31", [sample_item("2026-10-31-01", "https://example.com/news/sample-1", "2026-10-30")])
+    payload = build.collect(data, date(2026, 10, 31))
+    assert "2026-10-31-01" in ids(payload)
+    assert payload["excluded"] == []
 
 
 def test_duplicate_url_after_window_is_allowed(data):

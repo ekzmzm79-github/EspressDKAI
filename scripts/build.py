@@ -38,7 +38,9 @@ def collect(data_dir: Path, today: date) -> dict:
     }
 
     days, excluded = [], []
-    seen: dict[str, date] = {}  # 원문 URL → 처음 나온 날짜
+    # (원문 URL, 발행일) → 처음 나온 날짜. 릴리스 노트처럼 한 주소에 소식이 쌓이는 페이지가 있어
+    # URL만으로는 다른 소식이 같은 기사로 잡힌다. 발행일이 같아야 같은 기사로 본다.
+    seen: dict[tuple[str, str], date] = {}
     for path in common.data_files("day", data_dir):
         day = common.load_json(path)
         d = date.fromisoformat(day["date"])
@@ -48,12 +50,13 @@ def collect(data_dir: Path, today: date) -> dict:
         for item in day["items"]:
             if item["id"] in rejected:
                 continue
-            url = item["sources"][0]["url"]
-            first = seen.get(url)
+            src = item["sources"][0]
+            url, key = src["url"], (src["url"], src["published"])
+            first = seen.get(key)
             if first is not None and (d - first).days < index_days:
                 excluded.append({"item_id": item["id"], "url": url, "first_seen": first.isoformat()})
                 continue
-            seen.setdefault(url, d)
+            seen.setdefault(key, d)
             # 기간이 지난 날은 마감 전 채용 항목만 남긴다
             if d >= since or ("hiring" in item and date.fromisoformat(item["hiring"]["deadline"]) >= today):
                 items.append(item)
