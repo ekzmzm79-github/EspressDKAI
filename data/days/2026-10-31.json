@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-31",
+  "headline": {
+    "item_id": "2026-10-31-01",
+    "text": "Claude Opus 4.8 fast mode 지원 중단, 11월 30일부터 요청 시 오류"
+  },
+  "items": [
+    {
+      "id": "2026-10-31-01",
+      "section": "llm",
+      "event_key": "Claude Opus 4.8 fast mode 지원 중단, 11월 30일 제거",
+      "title": "Claude Opus 4.8 fast mode 지원 중단, 11월 30일 제거",
+      "card": [
+        "Anthropic이 Opus 4.8의 fast mode를 지원 중단 대상으로 지정했다",
+        "11월 30일 제거 뒤에는 fast mode 요청이 오류로 돌아온다",
+        "Opus 4.8에서 fast mode를 쓰던 곳은 Opus 5.5로 넘어가야 한다"
+      ],
+      "detail": "Anthropic이 Claude Platform 릴리스 노트에서 10월 30일 자로 Claude Opus 4.8의 fast mode를 지원 중단(deprecated)했다고 밝혔다. 제거일은 11월 30일이다. 그날이 지나면 Opus 4.8에서는 fast mode를 쓸 수 없고, 그 설정으로 호출하면 오류가 난다. Opus 4.8의 fast mode는 그동안 research preview 상태였다. 빠른 응답 모드가 필요하면 Opus 5.5로 옮기라는 것이 Anthropic의 안내다.",
+      "sources": [
+        {
+          "title": "Claude Platform release notes (October 30, 2026)",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "published": "2026-10-30"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 4,
+        "note": "날짜 근거 없는 Claude Code 변경 기록 출처와 그 주장 삭제, 직역 문장 3곳 고쳐 씀"
+      }
+    },
+    {
+      "id": "2026-10-31-02",
+      "section": "llm",
+      "event_key": "OpenAI, robots.txt 공동 신호로 AI 학습 선호 존중",
+      "title": "OpenAI, robots.txt 공동 신호로 AI 학습 선호 존중",
+      "card": [
+        "웹사이트가 robots.txt에 적은 AI 학습 관련 공동 신호를 지키기로 했다",
+        "이 방식에 동참한 AI 기업이라면 같은 신호를 읽게 된다"
+      ],
+      "detail": "OpenAI가 웹사이트 운영자가 robots.txt에 남기는 AI 학습 관련 선호를 따르겠다고 발표했다. 이 신호는 OpenAI 혼자 쓰는 것이 아니라 함께 참여하는 다른 AI 기업들도 읽는 공통 신호다. 기사 본문은 자동 요청이 막혀 읽지 못했고 공식 요약만 확인했다. 신호의 이름과 형식, 참여 기업, 적용 시점은 원문에서 확인해야 한다.",
+      "sources": [
+        {
+          "title": "Making it easier for websites to express AI training preferences",
+          "url": "https://openai.com/index/helping-websites-express-ai-training-preferences",
+          "published": "2026-10-30"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 3,
+        "note": "학습 허용·거부로 좁힌 해석과 직역 문장 고침, 제목·event_key 어휘 통일"
+      }
+    },
+    {
+      "id": "2026-10-31-03",
+      "section": "llm",
+      "event_key": "OpenAI 커뮤니티 안전 보고서, ChatGPT 폭력 예방·청소년 보호 강화",
+      "title": "OpenAI, ChatGPT 폭력 예방 강화하고 공공 안전 보고 약속",
+      "card": [
+        "폭력 위험이 보이면 ChatGPT가 더 일찍 끼어들도록 보호 장치를 늘린다",
+        "공공 안전과 관련된 보고를 하겠다는 약속이 새로 추가됐다"
+      ],
+      "detail": "OpenAI가 커뮤니티 안전 보고서와 청소년 보호 조치를 담은 글을 냈다. 공식 요약에 따르면 폭력과 관련된 대화에서 ChatGPT가 문제를 더 일찍 알아채 개입하도록 보호 장치를 키우고, 공공 안전과 관련해 보고하는 일을 새로 맡겠다고 했다. 기사 본문은 자동 요청이 막혀 읽지 못했다. 보고의 대상과 방식, 청소년 대상 조치의 구체적인 내용은 원문에서 확인해야 한다.",
+      "sources": [
+        {
+          "title": "Community safety report and new protections for teens",
+          "url": "https://openai.com/index/community-safety-report-and-new-protections-for-teens",
+          "published": "2026-10-30"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 3,
+        "note": "피드 설명 직역 문장 2곳과 제목 표현 고침"
+      }
+    }
+  ]
+}
