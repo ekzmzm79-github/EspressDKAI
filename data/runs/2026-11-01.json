@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-01",
+  "started_at": "2026-11-01T07:23:00+09:00",
+  "status": "empty",
+  "sections": {
+    "llm": {
+      "candidates": 0,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": []
+    },
+    "hiring": {
+      "candidates": 2,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "한국투자공사(KIC) AI 에이전트 공모전, 11월 12일 마감",
+          "url": "https://wikidocs.net/blog/@pandas_studio/32554/",
+          "reason": "10월 초 공고로 최근 7일 기간 밖이고 기사 원문 미확인"
+        },
+        {
+          "event_key": "해양수산부 항만 문제해결 AI 기술 공모전, 11월 2일 마감",
+          "url": "https://wikidocs.net/blog/@pandas_studio/32554/",
+          "reason": "10월 초 공고로 최근 7일 기간 밖이고 기사 원문 미확인"
+        }
+      ]
+    }
+  },
+  "note": "LLM: 피드 3곳(Google, DeepMind, OpenAI) 기간 내 새 글 0개. Anthropic 뉴스 상단의 'October 31, 2026'은 페이지 날짜 표시일 뿐 새 글 아님. Claude 플랫폼 릴리스 노트 최신은 10-30(어제 처리), Codex 변경 기록 최신은 10-29, Gemini 릴리스 노트 최신은 10-13. 채용: 최근 7일 안에 나온 마감 전 소식을 찾지 못함(SK하이닉스·SoftBank 등은 이미 색인에 스킵으로 있음). 주말(토요일) 수집분이라 소식이 적음"
+}
