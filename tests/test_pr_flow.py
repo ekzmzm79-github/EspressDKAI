@@ -149,7 +149,11 @@ def test_summary_marks_duplicate(tmp_path):
     data = tmp_path / "data"
     shutil.copytree(SAMPLE_DATA, data)
     path = data / "days" / "2026-10-30.json"
-    path.write_text(path.read_text(encoding="utf-8").replace("sample-1-price", "sample-1"), encoding="utf-8")
+    # 같은 기사: 주소와 발행일이 모두 10-28의 sample-1과 같다
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("sample-1-price", "sample-1").replace('"published": "2026-10-30"', '"published": "2026-10-27"'),
+        encoding="utf-8",
+    )
     body = pr_summary.summarize(["2026-10-30"], data)
     assert "중복으로 제외 예정" in body
     assert pr_summary.common.SITE_URL in body
