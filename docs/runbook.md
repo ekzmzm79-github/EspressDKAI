@@ -100,6 +100,8 @@ python scripts/briefing_branch.py publish
 검사(`validate.py`)에 실패하면 커밋하지 않고 오류를 출력한다. 오류를 고쳐 다시 `publish`한다.
 성공하면 PR 주소가 나온다. PR 본문은 스크립트가 만든다. 직접 고치지 않는다.
 
+마지막 응답과 알림에는 올린 항목 수, PR 주소, 배포 페이지 https://ekzmzm79-github.github.io/EspressDKAI/ (Merge 뒤 반영)를 함께 넣는다.
+
 ## 7. 실패했을 때
 
 - 출처 일부를 못 읽음: 읽은 것만으로 진행하고 `note`에 남긴다.

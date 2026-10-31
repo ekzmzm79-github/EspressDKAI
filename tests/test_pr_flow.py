@@ -152,6 +152,7 @@ def test_summary_marks_duplicate(tmp_path):
     path.write_text(path.read_text(encoding="utf-8").replace("sample-1-price", "sample-1"), encoding="utf-8")
     body = pr_summary.summarize(["2026-10-30"], data)
     assert "중복으로 제외 예정" in body
+    assert pr_summary.common.SITE_URL in body
     assert body.index("**LLM 개발사**") < body.index("**AI 채용·해커톤**")
 
 
