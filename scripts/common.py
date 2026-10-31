@@ -17,6 +17,7 @@ SCHEMA_DIR = ROOT / "schema"
 DATA_DIR = ROOT / "data"
 
 KST = ZoneInfo("Asia/Seoul")
+SITE_URL = "https://ekzmzm79-github.github.io/EspressDKAI/"  # 배포 페이지 (GitHub Pages)
 
 # 데이터 종류 → (data/ 아래 폴더, 스키마 파일)
 KINDS = {

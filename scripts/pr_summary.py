@@ -38,6 +38,7 @@ def summarize(dates: list[str], data_dir: Path = common.DATA_DIR, today: date | 
         "- **전체 승인:** Merge → 검사 후 자동 배포",
         "- **일부 제외:** 코멘트로 `/drop <항목 ID>` (여러 개는 공백으로 구분)",
         "- **전체 거절:** Merge 없이 PR 닫기",
+        f"- **배포 페이지:** {common.SITE_URL} (Merge 뒤 몇 분 안에 반영)",
     ]
 
     for d in dates:
