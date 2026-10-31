@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-31",
+  "started_at": "2026-10-31T14:29:00+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 4,
+      "passed": 3,
+      "verification_edits": 10,
+      "skipped": [
+        {
+          "event_key": "OpenAI, 공정 이용이 AI 학습에 이롭다는 법원 의견서 발췌 공개",
+          "title": "Fair use benefits everyone",
+          "url": "https://openai.com/index/fair-use-benefits-everyone",
+          "reason": "발행 시각(10-30 09:00 KST)이 수집 기간 밖이고 의견 글"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 3,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "2026 서울 AI 디지털 배움터 청년 해커톤, 11월 8일 접수 마감",
+          "url": "https://linkareer.com/activity/357358",
+          "reason": "공고가 10월 중순에 나와 최근 7일 기간 밖이고 기사 원문 없음"
+        },
+        {
+          "event_key": "CJ올리브네트웍스 2026 하반기 신입 공채, AI 역량진단 도입",
+          "url": "https://www.cjolivenetworks.co.kr/news/press_release/detail/863?ca=ALL",
+          "reason": "9월 기사로 기간 밖이며 지원이 이미 마감됨"
+        },
+        {
+          "event_key": "SoftBank 2026 채용 연계 해커톤 본선 11월 7~8일",
+          "url": "https://linkareer.com/activity/340301",
+          "reason": "참가 신청이 9월에 마감됨"
+        }
+      ]
+    }
+  },
+  "note": "OpenAI 기사 2건은 본문 403으로 RSS 설명만 확인. DeepMind RSS가 Content-Encoding 없이 gzip으로 와서 fetch.py feeds가 읽기 실패(직접 풀어 기간 내 새 글 없음 확인) — fetch.py에 gzip 처리 추가 필요. 채용 섹션은 최근 7일 안에 나온 마감 전 소식을 찾지 못함. Claude Code 변경 기록 2.1.316은 날짜가 없어 출처에서 뺌"
+}
