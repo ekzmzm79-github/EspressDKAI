@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import re
 import sys
 import urllib.error
@@ -27,13 +28,18 @@ TIMEOUT = 20
 OUT_DIR = Path("/tmp/espressdkai-fetch")
 
 
+def _unzip(body: bytes) -> bytes:
+    """압축 표시(Content-Encoding) 없이 gzip으로 오는 곳이 있다 (DeepMind RSS). 앞 두 바이트로 알아본다."""
+    return gzip.decompress(body) if body[:2] == b"\x1f\x8b" else body
+
+
 def get(url: str) -> tuple[str, str]:
     """(최종 주소, 본문). 실패하면 RuntimeError."""
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept-Language": "ko,en;q=0.8"})
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             charset = resp.headers.get_content_charset() or "utf-8"
-            return resp.geturl(), resp.read().decode(charset, errors="replace")
+            return resp.geturl(), _unzip(resp.read()).decode(charset, errors="replace")
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"HTTP {e.code}") from None
     except Exception as e:

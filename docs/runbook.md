@@ -15,13 +15,13 @@
 ## 1. 준비
 
 ```bash
-pip install -q -r requirements.txt
+python -m pip install -q --ignore-installed -r requirements.txt   # 클라우드 이미지의 PyYAML은 pip로 지울 수 없어 덮어 설치한다
 python scripts/briefing_branch.py prepare   # 열린 브리핑 PR이 있으면 이어 쓰고, 없으면 새 브랜치
 python scripts/index.py                     # 최근 7일 처리 기록 (공개·스킵·거절)
 ```
 
 색인에 있는 사건은 다시 올리지 않는다. 비교는 문자열이 아니라 **의미**로 한다. 같은 사건이면 새 사실이 있을 때만 후속으로 올리고, `event_key`에 "후속"을 붙인다.
-`prepare`가 실패하면(충돌 등) 수집하지 말고 실패 기록만 남긴다(7절).
+`prepare`가 실패하면(충돌 등) 수집하지 말고 실패 기록만 남긴다(8절).
 
 ## 2. 수집
 
@@ -102,7 +102,16 @@ python scripts/briefing_branch.py publish
 
 마지막 응답과 알림에는 올린 항목 수, PR 주소, 배포 페이지 https://ekzmzm79-github.github.io/EspressDKAI/ (Merge 뒤 반영)를 함께 넣는다.
 
-## 7. 실패했을 때
+## 7. 알려진 문제
+
+지난 실행에서 겪은 것이다. 다시 확인하느라 시간을 쓰지 말고 아래대로 한다. 새로 겪은 문제는 실행 기록 `note`에 남기면 사람이 확인해 여기로 옮긴다.
+
+- **OpenAI 기사 페이지는 403을 준다.** `openai.com/index/...` 본문은 읽지 못한다. RSS(`fetch.py feeds`)의 제목·설명·발행 시각으로 쓰고, 상세에 "공식 요약만 확인"이라고 밝힌다. PR의 링크 검사 봇이 403 경고를 달지만 배포는 막지 않는다.
+- **ChatGPT 릴리스 노트는 차단(`blocked`)이다.** 읽으려 하지 않는다. 같은 소식은 검색이나 다른 출처로 찾고 원문 링크만 건다.
+- **Claude Code 변경 기록(CHANGELOG)은 버전별 날짜가 없다.** 발행일을 쓸 수 없으니 단독 출처로 쓰지 않는다. 같은 변경이 날짜 있는 출처(Claude Platform 릴리스 노트 등)에 있을 때 그쪽을 출처로 쓴다.
+- **채용·해커톤은 검색 결과 대부분이 기간 밖이거나 마감됐다.** 0건이어도 정상이다. 검토한 후보는 사유와 함께 `skipped`에 남긴다.
+
+## 8. 실패했을 때
 
 - 출처 일부를 못 읽음: 읽은 것만으로 진행하고 `note`에 남긴다.
 - 웹 검색·조회가 전부 안 됨: 수집하지 않는다. `status: "failed"`인 실행 기록만 `publish`한다.

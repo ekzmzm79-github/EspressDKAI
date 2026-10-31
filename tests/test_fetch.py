@@ -29,3 +29,9 @@ def test_parse_atom():
 def test_html_to_text_drops_scripts_and_keeps_blocks():
     html = "<html><head><title>x</title></head><body><script>evil()</script><h1>제목</h1><p>첫  문단</p><div>둘째<br>줄</div></body></html>"
     assert fetch.html_to_text(html) == "제목\n첫 문단\n둘째\n줄"
+
+
+def test_unzip_handles_unmarked_gzip():
+    import gzip
+    assert fetch._unzip(gzip.compress("<rss/>".encode())) == b"<rss/>"
+    assert fetch._unzip(b"<rss/>") == b"<rss/>"
