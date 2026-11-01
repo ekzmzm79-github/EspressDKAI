@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-02",
+  "started_at": "2026-11-02T07:23:00+09:00",
+  "status": "empty",
+  "sections": {
+    "llm": {
+      "candidates": 0,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": []
+    },
+    "hiring": {
+      "candidates": 3,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "넥슨 채용형 인턴십 넥토리얼, 코딩테스트 폐지·AI 활용 역량 평가",
+          "url": "https://byline.network/2026/09/17-592/",
+          "reason": "9월 기사로 최근 7일 기간 밖"
+        },
+        {
+          "event_key": "기아 2026 하반기 집중 채용, AI 문제해결력 평가 첫 도입",
+          "url": "https://sateconomy.co.kr/news/view/1065572116804805",
+          "reason": "9월 기사로 최근 7일 기간 밖"
+        },
+        {
+          "event_key": "KT 대졸 신입 공채, AI 활용 역량 평가",
+          "url": "https://www.ddaily.co.kr/page/view/2026082511042750389",
+          "reason": "8월 기사로 최근 7일 기간 밖"
+        }
+      ]
+    }
+  },
+  "note": "LLM: 피드 3곳(Google, DeepMind, OpenAI) 기간 내 새 글 0개. Anthropic 뉴스 상단 'November 1, 2026'은 페이지 날짜 표시일 뿐 새 글 아님. Claude 플랫폼 릴리스 노트 최신 10-30, Codex 변경 기록 최신 10-29, Gemini 릴리스 노트 최신 10-13(모두 이미 처리했거나 기간 밖). 채용: 검색 5회에서 최근 7일 안에 나온 마감 전 소식 없음(KIC·항만 공모전·SoftBank·SK하이닉스는 색인에 스킵으로 있음). 일요일 수집분이라 소식이 적음"
+}
