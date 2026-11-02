@@ -35,3 +35,26 @@ def test_unzip_handles_unmarked_gzip():
     import gzip
     assert fetch._unzip(gzip.compress("<rss/>".encode())) == b"<rss/>"
     assert fetch._unzip(b"<rss/>") == b"<rss/>"
+
+
+def test_date_patterns_cover_window():
+    import re
+    pat = re.compile(fetch.date_patterns(datetime(2026, 10, 30, 7, 23, tzinfo=common.KST), datetime(2026, 11, 1, 7, 23, tzinfo=common.KST)))
+    for text in ("October 30, 2026", "Oct 31, 2026", "November 1, 2026", "Nov 01 2026", "2026-11-01", "2026.10.31"):
+        assert pat.search(text), text
+    for text in ("October 29, 2026", "2026-11-02"):
+        assert not pat.search(text), text
+
+
+def test_window_since_last_run(tmp_path):
+    import json
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    sec = {"window": {"since_last_run": True, "hours": 24, "max_days": 8}}
+    now = datetime(2026, 11, 7, 8, 0, tzinfo=common.KST)
+    assert common.window_since(sec, now, tmp_path) == datetime(2026, 11, 6, 8, 0, tzinfo=common.KST)
+    for day, status in (("2026-10-31", "published"), ("2026-11-06", "failed"), ("2026-11-07", "empty")):
+        (runs / f"{day}.json").write_text(json.dumps({"date": day, "started_at": f"{day}T08:00:00+09:00", "status": status}))
+    assert common.window_since(sec, now, tmp_path) == datetime(2026, 10, 31, 8, 0, tzinfo=common.KST)
+    sec["window"]["max_days"] = 3
+    assert common.window_since(sec, now, tmp_path) == datetime(2026, 11, 4, 8, 0, tzinfo=common.KST)

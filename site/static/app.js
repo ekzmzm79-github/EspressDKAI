@@ -425,7 +425,7 @@
     if (!rows.length) {
       return el("section", { class: "section", id: "section-hiring", "aria-labelledby": "hiring-title" },
         sectionHead("hiring", "OPPORTUNITIES & HACKATHONS", title, ""),
-        el("p", { class: "empty" }, "진행 중인 채용·해커톤 소식 없음"));
+        el("p", { class: "empty" }, "진행 중인 채용·해커톤·인재육성 소식 없음"));
     }
 
     const list = el("div", { class: "deadlines" }, rows.map(({ item, left }) => {

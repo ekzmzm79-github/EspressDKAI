@@ -1,5 +1,5 @@
 id: hiring
-title: AI 채용·해커톤
+title: AI 채용·해커톤·인재육성
 public: true
 order: 2
 max_items: 5
@@ -9,8 +9,8 @@ window:
   days: 7
 keep_until_deadline: true
 
-types: [AI 과제, AI 면접, 해커톤, 공모전, 기타]
-targets: [신입, 경력]
+types: [AI 과제, AI 면접, 해커톤, 공모전, 인재육성, 기타]
+targets: [신입, 경력, 청년]   # 청년: 연령 기준 공고(인재육성 프로그램 등)
 
 search_keywords:
   - AI 역량평가
@@ -18,6 +18,8 @@ search_keywords:
   - 채용연계 해커톤
   - AI 네이티브 채용
   - 패스트트랙 채용
+  - AI 인재 양성 프로그램 모집
+  - AI 아카데미 모집
 
 sources:
   - name: 뉴스 검색
