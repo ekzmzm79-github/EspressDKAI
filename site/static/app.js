@@ -194,13 +194,23 @@
     return el("ul", { class: "points" }, item.card.map((line) => el("li", {}, line)));
   }
 
-  function detailTrigger(item) {
+  function detailTrigger(item, ...leading) {
     const btn = el("button", {
       type: "button",
       class: "detail-btn",
       onclick: (e) => openModal(item, e.currentTarget),
     }, `자세히 · 원문 ${item.sources.length} ↗`);
-    return el("div", { class: "card-actions" }, btn);
+    return el("div", { class: "card-actions" }, ...leading, btn);
+  }
+
+  // 채용 항목의 지원 링크. 공식 주소가 없으면 공고 이름으로 웹 검색을 연결한다
+  function applyLink(item) {
+    const official = item.hiring.apply_url;
+    const query = item.title.split(",")[0].trim();
+    return {
+      href: official || `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+      hint: official ? "공식 모집 페이지 (새 창)" : `공식 주소 미확인 · '${query}' 웹 검색 (새 창)`,
+    };
   }
 
   function sectionHead(id, kicker, title, countText, extra) {
@@ -432,6 +442,7 @@
       const isNew = item.date === today;
       const urgent = left <= URGENT_DAYS;
       const state = isNew ? "신규" : urgent ? "마감 임박" : "진행 중";
+      const apply = applyLink(item);
       return el("article", {
         class: `job reveal-card${urgent ? " urgent" : ""}`,
         id: `item-${item.id}`,
@@ -446,9 +457,10 @@
         el("p", { class: "job-meta" },
           el("span", { class: `state-pill${isNew ? " new" : urgent ? " soon" : ""}` }, state),
           el("span", {}, `${item.hiring.company} · ${item.hiring.type} · ${shortDate(item.hiring.deadline)} 마감`)),
-        el("h3", {}, item.title),
+        el("h3", {}, el("a", { class: "job-link", href: apply.href, target: "_blank", rel: "noopener noreferrer", title: apply.hint }, item.title)),
         points(item),
-        detailTrigger(item)));
+        detailTrigger(item,
+          el("a", { class: "apply-btn", href: apply.href, target: "_blank", rel: "noopener noreferrer", title: apply.hint, "aria-label": `지원하기: ${apply.hint}` }, "지원하기 ↗"))));
     }));
 
     return el("section", { class: "section", id: "section-hiring", "aria-labelledby": "hiring-title" },
