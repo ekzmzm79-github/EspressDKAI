@@ -110,6 +110,7 @@ DAY = "days/2026-10-28.json"
     (lambda d: d["items"][2]["hiring"].update(deadline="2026-10-27"), "이미 마감됨"),
     (lambda d: d["items"][2]["hiring"].update(apply_start="2026-11-12"), "접수 시작일"),
     (lambda d: d["items"][0].update(section="economy"), "스키마"),
+    (lambda d: d["items"][2]["hiring"].update(apply_url="javascript:alert(1)"), "스키마"),
 ])
 def test_day_rules(data, mutate, expected):
     edit(data / DAY, mutate)
@@ -149,6 +150,11 @@ def test_window_exception_skips_window_check(data):
 def test_published_after_file_date_fails(data):
     edit(data / DAY, lambda d: d["items"][0]["sources"][0].update(published="2026-10-29"))
     assert any("파일 날짜" in e for e in errors_of(data))
+
+
+def test_apply_url_is_optional_url(data):
+    edit(data / DAY, lambda d: d["items"][2]["hiring"].update(apply_url="https://example.com/apply"))
+    assert errors_of(data) == []
 
 
 def test_hiring_window_is_seven_days(data):

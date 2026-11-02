@@ -19,6 +19,8 @@
   --new: #7ee2b8;
   --new-bg: rgba(126, 226, 184, 0.12);
   --on-accent: #120d0a;
+  --cta: #e0873a;          /* 지원하기. 크림색(마감 임박)과 구분되는 주황 */
+  --cta-bright: #f29b4f;
   --sans: "Inter", "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --mouse-x: 50vw;
@@ -926,6 +928,55 @@ a:hover {
   background: var(--accent);
   color: var(--on-accent);
   border-color: var(--accent);
+}
+
+.card-actions:has(.apply-btn) {
+  flex-wrap: wrap;
+}
+
+.card-actions .apply-btn,
+.card-actions .detail-btn {
+  white-space: nowrap;
+}
+
+.card-actions .detail-btn {
+  margin-left: auto;
+}
+
+/* 좁은 화면: 한 줄에 안 들어가면 지원하기 아래로 자세히를 왼쪽 정렬해 쌓는다 */
+@media (max-width: 480px) {
+  .card-actions:has(.apply-btn) .detail-btn {
+    margin-left: 0;
+  }
+}
+
+.apply-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--cta);
+  color: var(--on-accent);
+  font: 700 13px/1 var(--sans);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.apply-btn:hover {
+  background: var(--cta-bright);
+  color: var(--on-accent);
+}
+
+.job-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.job-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--cta);
+  text-underline-offset: 4px;
 }
 
 /* ---------- AI 채용·해커톤 (D-day 긴급도 위계 명확화) ---------- */

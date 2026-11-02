@@ -84,7 +84,8 @@
         "eligibility": { "description": "참가 자격 요점 한 줄", "type": "string", "minLength": 1 },
         "apply_start": { "type": "string", "format": "date" },
         "deadline": { "type": "string", "format": "date" },
-        "benefit": { "type": "string" }
+        "benefit": { "type": "string" },
+        "apply_url": { "description": "공식 모집·지원 페이지. 직접 열어 확인한 것만. 없으면 화면에서 공고 이름으로 웹 검색을 연결한다", "$ref": "#/$defs/url" }
       }
     }
   }
