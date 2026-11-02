@@ -12,14 +12,14 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
 import common
 
 
 def build_index(data_dir: Path = common.DATA_DIR, today: date | None = None) -> list[dict]:
-    """최근 `index_days`일 처리 기록. 날짜 오름차순.
+    """최근 `index_days`일(또는 직전 실행 이후) 처리 기록. 날짜 오름차순.
 
     - published: days/에 있는 항목 (main에 공개됐거나 열린 PR에서 대기 중)
     - skipped:   runs/의 skipped (AI가 기준 미달로 뺀 후보)
@@ -28,6 +28,10 @@ def build_index(data_dir: Path = common.DATA_DIR, today: date | None = None) -> 
     """
     today = today or common.today_kst()
     since = today - timedelta(days=common.rules()["index_days"] - 1)
+    # 실행 주기가 index_days보다 길어도 직전 실행 기록은 늘 보이게 한다
+    last = common.last_run_at(datetime.combine(today, time(), common.KST), data_dir)
+    if last:
+        since = min(since, last.date())
 
     published: dict[str, dict] = {}
     for path in common.data_files("day", data_dir):

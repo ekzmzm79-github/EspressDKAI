@@ -61,7 +61,8 @@
             "note": { "type": "string" }
           }
         },
-        "hiring": { "$ref": "#/$defs/hiring" }
+        "hiring": { "$ref": "#/$defs/hiring" },
+        "window_exception": { "description": "사람이 수집 기간 밖 항목을 올리기로 정한 이유. 있으면 발행일 기간 검사를 건너뛴다", "type": "string", "minLength": 1 }
       },
       "if": { "properties": { "section": { "const": "hiring" } } },
       "then": { "required": ["hiring"] },
@@ -73,12 +74,12 @@
       "required": ["company", "type", "targets", "eligibility", "deadline"],
       "properties": {
         "company": { "type": "string", "minLength": 1 },
-        "type": { "enum": ["AI 과제", "AI 면접", "해커톤", "공모전", "기타"] },
+        "type": { "enum": ["AI 과제", "AI 면접", "해커톤", "공모전", "인재육성", "기타"] },
         "targets": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "enum": ["신입", "경력"] }
+          "items": { "enum": ["신입", "경력", "청년"] }
         },
         "eligibility": { "description": "참가 자격 요점 한 줄", "type": "string", "minLength": 1 },
         "apply_start": { "type": "string", "format": "date" },

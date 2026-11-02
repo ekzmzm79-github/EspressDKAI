@@ -1,5 +1,6 @@
 """출처 읽기. RSS 피드와 웹페이지를 텍스트로 받아 파일로 저장하고 요약만 출력한다.
 
+    python scripts/fetch.py window                 # 섹션별 수집 기간과 grep용 날짜 패턴
     python scripts/fetch.py feeds                  # config/sections/*.yaml의 피드에서 수집 기간 안 항목 목록
     python scripts/fetch.py page URL [URL...]      # 페이지 본문을 텍스트 파일로 저장하고 앞부분만 출력
 
@@ -90,8 +91,7 @@ def parse_feed(xml: str) -> list[dict]:
 def feeds(now: datetime) -> int:
     failed = 0
     for section in common.sections().values():
-        window = section["window"]
-        since = now - (timedelta(days=window["days"]) if "days" in window else timedelta(hours=window["hours"]))
+        since = common.window_since(section, now)
         for source in section.get("sources", []):
             if "feed" not in source:
                 continue
@@ -106,6 +106,33 @@ def feeds(now: datetime) -> int:
             for e in items:
                 print(f"  {e['published']:%Y-%m-%d %H:%M} | {e['title']} | {e['url']}")
     return 1 if failed else 0
+
+
+# ---------- 수집 기간 ----------
+
+def date_patterns(since: datetime, now: datetime) -> str:
+    """기간 안 날짜를 출처들이 쓰는 표기로 모은 grep -E 패턴."""
+    days, d = [], since.date()
+    while d <= now.date():
+        days.append(d)
+        d += timedelta(days=1)
+    forms = set()
+    for d in days:
+        forms |= {
+            f"{d:%B} 0?{d.day},? {d.year}",      # October 30, 2026
+            f"{d:%b} 0?{d.day},? {d.year}",      # Oct 30, 2026
+            f"{d:%Y}[-.]{d:%m}[-.]{d:%d}",       # 2026-10-30, 2026.10.30
+        }
+    return "(" + "|".join(sorted(forms)) + ")"
+
+
+def window(now: datetime) -> int:
+    for section in common.sections().values():
+        since = common.window_since(section, now)
+        print(f"[{section['id']}] {since:%Y-%m-%d %H:%M} ~ {now:%Y-%m-%d %H:%M} KST")
+        if section["id"] == "llm":
+            print(f"  grep -nE '{date_patterns(since, now)}' <파일>")
+    return 0
 
 
 # ---------- 웹페이지 ----------
@@ -166,14 +193,15 @@ def page(urls: list[str], head: int, out: Path) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("window")
     sub.add_parser("feeds")
     p = sub.add_parser("page")
     p.add_argument("urls", nargs="+")
     p.add_argument("--head", type=int, default=15, help="화면에 보일 앞부분 줄 수")
     p.add_argument("--out", type=Path, default=OUT_DIR)
     args = parser.parse_args()
-    if args.cmd == "feeds":
-        sys.exit(feeds(common.now_kst()))
+    if args.cmd in ("window", "feeds"):
+        sys.exit({"window": window, "feeds": feeds}[args.cmd](common.now_kst()))
     sys.exit(page(args.urls, args.head, args.out))
 
 

@@ -19,7 +19,7 @@ import common
 QUOTE = re.compile(r"[“\"]([^”\"]*)[”\"]")
 
 
-def check_day(doc: dict, path: Path, today: date) -> list[str]:
+def check_day(doc: dict, path: Path, today: date, data_dir: Path = common.DATA_DIR) -> list[str]:
     errors = []
     rules = common.rules()
     text = rules["text"]
@@ -40,11 +40,11 @@ def check_day(doc: dict, path: Path, today: date) -> list[str]:
         errors.append(f"headline: {text['headline_max_chars']}자 초과")
 
     for item in doc["items"]:
-        errors += [f"{item['id']}: {e}" for e in check_item(item, day, sections, rules)]
+        errors += [f"{item['id']}: {e}" for e in check_item(item, day, sections, rules, data_dir)]
     return errors
 
 
-def check_item(item: dict, day: date, sections: dict, rules: dict) -> list[str]:
+def check_item(item: dict, day: date, sections: dict, rules: dict, data_dir: Path = common.DATA_DIR) -> list[str]:
     errors = []
     text = rules["text"]
     quote = rules["quote"]
@@ -75,10 +75,12 @@ def check_item(item: dict, day: date, sections: dict, rules: dict) -> list[str]:
             errors.append(f"인용 {len(q)}자 (최대 {quote['max_chars']}자): {q[:20]}…")
 
     # 첫 번째 출처가 원문. 발행일이 섹션 수집 기간 안이어야 한다
+    # (사람이 정한 예외 항목은 window_exception에 이유를 적고 기간 검사를 건너뛴다)
     published = date.fromisoformat(item["sources"][0]["published"])
-    window = section["window"]
-    earliest = day - (timedelta(days=window["days"]) if "days" in window else timedelta(hours=window["hours"]))
-    if not earliest <= published <= day:
+    earliest = common.window_earliest(section, day, data_dir)
+    if published > day:
+        errors.append(f"원문 발행일 {published}이 파일 날짜 {day}보다 늦다")
+    elif published < earliest and not item.get("window_exception"):
         errors.append(f"원문 발행일 {published}이 수집 기간({earliest}~{day}) 밖")
 
     if hiring := item.get("hiring"):
@@ -133,7 +135,7 @@ def validate(data_dir: Path = common.DATA_DIR, today: date | None = None) -> tup
             ]
             if not errors:  # 스키마가 맞아야 내용 규칙을 볼 수 있다
                 if kind == "day":
-                    errors = check_day(doc, path, today)
+                    errors = check_day(doc, path, today, data_dir)
                 elif kind == "run":
                     errors = check_run(doc, path, today, data_dir)
                 else:

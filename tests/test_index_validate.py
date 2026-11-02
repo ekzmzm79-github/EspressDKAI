@@ -40,9 +40,29 @@ def test_index_statuses():
     assert [e["url"] for e in by_status["rejected"]] == ["https://example.com/news/rumor"]
 
 
-def test_index_window_keeps_open_hiring_only():
-    entries = index.build_index(SAMPLE_DATA, date(2026, 11, 6))
+def add_run(data, day, status="empty"):
+    (data / "runs" / f"{day}.json").write_text(json.dumps({
+        "date": day, "started_at": f"{day}T07:23:00+09:00", "status": status,
+        "sections": {s: {"candidates": 0, "passed": 0, "verification_edits": 0, "skipped": []} for s in ("llm", "hiring")},
+    }), encoding="utf-8")
+
+
+def test_index_window_keeps_open_hiring_only(data):
+    add_run(data, "2026-11-05")
+    entries = index.build_index(data, date(2026, 11, 6))
     assert [e["event_key"] for e in entries] == ["예시전자 AI 해커톤 본선, 11월 11일"]
+
+
+def test_index_reaches_back_to_last_run(data):
+    """주기가 index_days보다 길어도 직전 실행 기록은 색인에 남는다."""
+    entries = index.build_index(data, date(2026, 11, 6))
+    assert any(e["date"] == "2026-10-30" for e in entries)
+
+
+def test_index_skips_failed_last_run(data):
+    add_run(data, "2026-11-05", status="failed")
+    entries = index.build_index(data, date(2026, 11, 6))
+    assert any(e["date"] == "2026-10-30" for e in entries)
 
 
 def test_index_ignores_future_files():
@@ -100,6 +120,35 @@ def test_day_rules(data, mutate, expected):
 def test_quote_within_limit_passes(data):
     edit(data / DAY, lambda d: d["items"][0].update(detail="그는 “" + "가" * 40 + "”라고 했다"))
     assert errors_of(data) == []
+
+
+def test_llm_window_starts_at_last_run(data):
+    """10-28 파일의 직전 실행은 10-27. 10-27 발행은 기간 안, 10-26은 밖."""
+    edit(data / DAY, lambda d: d["items"][0]["sources"][0].update(published="2026-10-27"))
+    assert errors_of(data) == []
+    edit(data / DAY, lambda d: d["items"][0]["sources"][0].update(published="2026-10-26"))
+    assert any("수집 기간(2026-10-27~2026-10-28)" in e for e in errors_of(data))
+
+
+def test_llm_window_follows_weekly_cadence(data):
+    """직전 실행이 일주일 전이면 그날부터가 기간이다."""
+    (data / "runs" / "2026-10-27.json").unlink()
+    add_run(data, "2026-10-21")
+    edit(data / DAY, lambda d: d["items"][0]["sources"][0].update(published="2026-10-21"))
+    assert errors_of(data) == []
+
+
+def test_window_exception_skips_window_check(data):
+    def mutate(d):
+        d["items"][2]["sources"][0].update(published="2026-10-01")
+        d["items"][2]["window_exception"] = "운영자 요청"
+    edit(data / DAY, mutate)
+    assert errors_of(data) == []
+
+
+def test_published_after_file_date_fails(data):
+    edit(data / DAY, lambda d: d["items"][0]["sources"][0].update(published="2026-10-29"))
+    assert any("파일 날짜" in e for e in errors_of(data))
 
 
 def test_hiring_window_is_seven_days(data):
