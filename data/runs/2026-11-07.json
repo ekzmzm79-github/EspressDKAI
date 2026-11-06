@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-07",
+  "started_at": "2026-11-07T08:06:00+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 15,
+      "passed": 5,
+      "verification_edits": 12,
+      "skipped": [
+        {
+          "event_key": "Codex CLI 0.167.0 배포, 에이전트 명령 센터 등",
+          "url": "https://learn.chatgpt.com/docs/changelog",
+          "reason": "권장 최대치(5) 안에서 중요도 낮은 정기 CLI 릴리스"
+        },
+        {
+          "event_key": "Claude 텍스트 워터마크 적용 모델 안내(Mythos 5·Opus 4.7·Sonnet 4.6)",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "reason": "권장 최대치(5) 안에서 중요도 낮음(11-03 릴리스 노트)"
+        },
+        {
+          "event_key": "OpenAI Daybreak Red, AWS GovCloud(US-East) 제공",
+          "url": "https://openai.com/index/daybreak-red-aws-govcloud",
+          "reason": "미국 정부용 승인 고객 한정 제공 범위 확대로 중요도 낮음"
+        },
+        {
+          "event_key": "OpenAI 보안 버그 바운티 보상 상향",
+          "url": "https://openai.com/index/rewarding-defenders-with-bigger-bug-bounties",
+          "reason": "모델·제품 변경이 아닌 보안 프로그램 소식"
+        },
+        {
+          "event_key": "OpenAI, Pierre Computer Company 인수",
+          "url": "https://openai.com/index/openai-to-acquire-pierre",
+          "reason": "인수 소식으로 올리지 않는 유형"
+        },
+        {
+          "event_key": "OpenAI BioBasicsBench 벤치마크 공개",
+          "url": "https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science",
+          "reason": "연구 벤치마크 발표로 제품 변경 아님"
+        },
+        {
+          "event_key": "OpenAI LifeVal 벤치마크 공개",
+          "url": "https://openai.com/index/lifeval",
+          "reason": "연구 벤치마크 발표로 제품 변경 아님"
+        },
+        {
+          "event_key": "OpenAI National Community Compact·Compute Campus 정책 청사진",
+          "url": "https://openai.com/index/setting-new-standard-responsible-ai-infrastructure",
+          "reason": "데이터센터 대외 정책 제안으로 모델·제품 정책 문서 개정 아님"
+        },
+        {
+          "event_key": "OpenAI Grid Protectors Program",
+          "url": "https://openai.com/index/grid-protectors-program",
+          "reason": "전력망 협력 프로그램으로 올리지 않는 유형"
+        },
+        {
+          "event_key": "Google Antigravity 에이전트 화학정보학 사례",
+          "url": "https://deepmind.google/blog/agentic-cheminformatics-with-google-antigravity/",
+          "reason": "활용 사례 글로 제품 변경 아님"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 3,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "2026 AI 활용 전국 대학생 창업 해커톤(한림대), 11월 11일 신청 마감",
+          "url": "https://cse.snu.ac.kr/ko/community/notice/25794",
+          "reason": "최근 7일 기사 없음, 공지 원문 읽기 실패로 마감일 직접 확인 불가"
+        },
+        {
+          "event_key": "동그라미재단 AI 아카데미 9기(서울), 11월 10일 마감",
+          "url": "https://superookie.com/seminars/6ae00c745f77fa40263435b2",
+          "reason": "재게시 사이트뿐이고 본문 확인 불가, 기사·공식 페이지 미확인"
+        },
+        {
+          "event_key": "AI+ Academy(KT·Salesforce·Intel) 실무교육 교육생 모집, 12월 6일 마감",
+          "url": "https://stat.snu.ac.kr/33226/",
+          "reason": "공지 본문 읽기 실패, 관련 기사·공식 페이지 찾지 못함"
+        }
+      ]
+    }
+  },
+  "note": "수집 기간 11-02 07:23~11-07 08:06(직전 실행 11-02). OpenAI 기사 본문 403으로 GPT-6 Cyber·Images 2.6은 RSS 공식 요약만 사용. Anthropic 뉴스 기간 내 새 글 없음, Gemini 릴리스 노트 기간 내 항목 없음. fetch.py feeds가 피드 설명(description)을 출력·저장하지 않아 RSS를 별도로 받아 확인함(설명도 저장하면 편함). 채용: 검색 7회, 최근 7일 안에 기사·공식 페이지로 마감일을 확인할 수 있는 공고 없음. cse.snu.ac.kr 공지는 읽기 실패(URLError)."
+}
