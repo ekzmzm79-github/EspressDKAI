@@ -2,6 +2,7 @@
 
     python scripts/fetch.py window                 # 섹션별 수집 기간과 grep용 날짜 패턴
     python scripts/fetch.py feeds                  # config/sections/*.yaml의 피드에서 수집 기간 안 항목 목록
+                                                   # (설명 전문은 /tmp/espressdkai-fetch/feeds.txt에 저장)
     python scripts/fetch.py page URL [URL...]      # 페이지 본문을 텍스트 파일로 저장하고 앞부분만 출력
 
 요청에는 이 프로젝트 이름과 저장소 주소를 밝힌다. 자동 요청을 막는 사이트는 우회하지 않고
@@ -68,7 +69,7 @@ def _date(text: str | None) -> datetime | None:
 
 
 def parse_feed(xml: str) -> list[dict]:
-    """RSS item / Atom entry → [{title, url, published}] (published는 KST datetime 또는 None)."""
+    """RSS item / Atom entry → [{title, url, published, summary}] (published는 KST datetime 또는 None)."""
     root = ET.fromstring(xml)
     entries = []
     for node in root.iter():
@@ -84,12 +85,23 @@ def parse_feed(xml: str) -> list[dict]:
         if published and published.tzinfo:
             published = published.astimezone(common.KST)
         title = (fields["title"].text or "").strip() if "title" in fields else ""
-        entries.append({"title": re.sub(r"\s+", " ", title), "url": url, "published": published})
+        summary = ""
+        for key in ("description", "summary", "content"):
+            if key in fields and (fields[key].text or "").strip():
+                summary = html_to_text(fields[key].text).replace("\n", " ")
+                break
+        entries.append({"title": re.sub(r"\s+", " ", title), "url": url, "published": published,
+                        "summary": re.sub(r"\s+", " ", summary).strip()})
     return entries
 
 
-def feeds(now: datetime) -> int:
+SUMMARY_CHARS = 140
+
+
+def feeds(now: datetime, out: Path = OUT_DIR) -> int:
+    """화면에는 항목마다 설명 앞부분만, 파일(feeds.txt)에는 설명 전문을 남긴다. 검증 서브에이전트에게 이 파일을 준다."""
     failed = 0
+    saved = []
     for section in common.sections().values():
         since = common.window_since(section, now)
         for source in section.get("sources", []):
@@ -105,6 +117,15 @@ def feeds(now: datetime) -> int:
             print(f"[{section['id']}] {source['name']}: {len(items)}개 (기준 {since:%m-%d %H:%M} 이후)")
             for e in items:
                 print(f"  {e['published']:%Y-%m-%d %H:%M} | {e['title']} | {e['url']}")
+                if e["summary"]:
+                    short = e["summary"] if len(e["summary"]) <= SUMMARY_CHARS else e["summary"][:SUMMARY_CHARS] + "…"
+                    print(f"      {short}")
+                saved.append(f"[{section['id']}] {source['name']}\n발행(KST): {e['published']:%Y-%m-%d %H:%M}\n"
+                             f"제목: {e['title']}\n주소: {e['url']}\n설명: {e['summary'] or '(없음)'}\n")
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / "feeds.txt"
+    path.write_text("\n".join(saved), encoding="utf-8")
+    print(f"설명 전문: {path}")
     return 1 if failed else 0
 
 

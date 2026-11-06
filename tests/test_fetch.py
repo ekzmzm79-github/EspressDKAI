@@ -58,3 +58,28 @@ def test_window_since_last_run(tmp_path):
     assert common.window_since(sec, now, tmp_path) == datetime(2026, 10, 31, 8, 0, tzinfo=common.KST)
     sec["window"]["max_days"] = 3
     assert common.window_since(sec, now, tmp_path) == datetime(2026, 11, 4, 8, 0, tzinfo=common.KST)
+
+
+def test_parse_feed_keeps_summary_as_plain_text():
+    rss = """<?xml version="1.0"?><rss><channel>
+<item><title>A</title><link>https://example.com/a</link><description><![CDATA[<p>Faster  <b>images</b></p>]]></description></item>
+<item><title>B</title><link>https://example.com/b</link></item>
+</channel></rss>"""
+    a, b = fetch.parse_feed(rss)
+    assert a["summary"] == "Faster images"
+    assert b["summary"] == ""
+
+
+def test_feeds_saves_full_summaries(tmp_path, monkeypatch, capsys):
+    long = "x" * 300
+    rss = f"""<?xml version="1.0"?><rss><channel>
+<item><title>A</title><link>https://example.com/a</link><pubDate>Thu, 05 Nov 2026 09:00:00 GMT</pubDate><description>{long}</description></item>
+</channel></rss>"""
+    monkeypatch.setattr(common, "sections", lambda: {"llm": {"id": "llm", "sources": [{"name": "S", "feed": "https://example.com/rss"}]}})
+    monkeypatch.setattr(common, "window_since", lambda sec, now: datetime(2026, 11, 1, tzinfo=common.KST))
+    monkeypatch.setattr(fetch, "get", lambda url: (url, rss))
+    assert fetch.feeds(datetime(2026, 11, 7, tzinfo=common.KST), tmp_path) == 0
+    printed = capsys.readouterr().out
+    assert "x" * fetch.SUMMARY_CHARS + "…" in printed and long not in printed
+    saved = (tmp_path / "feeds.txt").read_text(encoding="utf-8")
+    assert long in saved and "발행(KST): 2026-11-05 18:00" in saved
