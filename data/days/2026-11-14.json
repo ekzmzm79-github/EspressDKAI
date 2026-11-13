@@ -1,0 +1,134 @@
+{
+  "date": "2026-11-14",
+  "headline": {
+    "item_id": "2026-11-14-01",
+    "text": "Anthropic, Claude Fable 5.2 출시… 입출력 가격은 5.1보다 20% 낮춰"
+  },
+  "items": [
+    {
+      "id": "2026-11-14-01",
+      "section": "llm",
+      "event_key": "Anthropic Claude Fable 5.2·Mythos 5.2 출시",
+      "title": "Claude Fable 5.2·Mythos 5.2 출시, 가격 인하",
+      "card": [
+        "Anthropic이 고난도 추론·장기 에이전트 작업용 Claude Fable 5.2를 내놨다",
+        "같은 성능의 Mythos 5.2는 검증 프로그램을 거친 조직에만 열린다",
+        "가격은 입력 100만 토큰당 8달러, 출력 40달러로 5.1보다 낮다"
+      ],
+      "detail": "Claude 플랫폼 릴리스 노트(11월 9일)에 따르면 컨텍스트 창은 100만 토큰, 한 번에 내는 출력은 최대 12만 8천 토큰이며 적응형 사고가 늘 켜져 있다. 이는 두 모델 공통이다. 가격은 입력 8달러·출력 40달러(100만 토큰당)로, 5.1의 10달러·50달러보다 내려갔다. Mythos 5.2는 사이버 검증 프로그램 등으로 확인된 조직만 쓸 수 있다. 컴퓨터 사용은 새 툴셋(computer_toolset_20260801)으로 해야 하며, 기존 computer_20251124 도구를 선언하면 Amazon Bedrock을 빼고 400 오류가 난다. 시스템 프롬프트·도구·이전 메시지를 고친 뒤 이 모델의 사고 블록을 돌려보내도 400 오류가 난다. 30일 데이터 보존이 필요하다. Fable 5.2에는 Claude API에서 출력 속도를 최대 2.5배 높이는 fast mode가 입력 16달러·출력 80달러에 제공된다. Anthropic 발표 글 본문은 열지 못해 릴리스 노트로 확인했다.",
+      "sources": [
+        {
+          "title": "Claude Platform release notes",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "published": "2026-11-09"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 5,
+        "note": "fast mode 대상을 Fable 5.2로 한정, 사고 블록 오류 조건 구체화, '이전 버전과 달리' 삭제, 사양 문장 재구성, 목록 페이지 보조 출처 삭제"
+      }
+    },
+    {
+      "id": "2026-11-14-02",
+      "section": "llm",
+      "event_key": "Google Gemini 4 Hydrogen 출시, Google 검색 적용",
+      "title": "Gemini 4 Hydrogen 출시, 구글 검색에도 적용",
+      "card": [
+        "Google이 빠른 코딩·에이전트 실행용 모델 Gemini 4 Hydrogen을 공개했다",
+        "Gemini 앱·API·AI Studio와 함께 전 세계 Google 검색에도 들어갔다",
+        "100만 토큰당 입력 1.5달러·출력 7.5달러, 컨텍스트 길이와 무관한 단일 가격"
+      ],
+      "detail": "Hydrogen은 깊은 추론용인 Carbon·Argon과 달리 빠른 실행에 맞춘 모델이다. Google은 Artificial Analysis 지수 기본 설정에서 Argon을 앞섰고(51 대 50), Gemini 3.8 Flash보다 작업을 2.5배 빨리 끝낸다고 밝혔다. 사고 수준은 low·medium·high(기본)와 새 xhigh 4단계다. 100만 토큰 입력과 최대 100만 토큰 출력을 지원한다. Google Antigravity에는 한 세션 안에서 Carbon과 Hydrogen을 오가는 Orchestrator 기능이 추가됐다. 검색에서는 여러 갈래 질문 이해, 더 넓은 링크 연결, 이미지·비교표 등 시각 요소가 많아졌다고 설명한다. Antigravity에서는 Google AI Pro·Ultra 유료 구독자가 쓸 수 있다.",
+      "sources": [
+        {
+          "title": "Introducing Gemini 4 Hydrogen",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/",
+          "published": "2026-11-13"
+        },
+        {
+          "title": "Google Search gets a major upgrade with Gemini 4 Hydrogen",
+          "url": "https://blog.google/products-and-platforms/products/search/gemini-4-hydrogen-search-upgrade/",
+          "published": "2026-11-13"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 2,
+        "note": "'이어'를 '함께'로, '표·이미지 위주'를 '시각 요소가 많아졌다'로"
+      }
+    },
+    {
+      "id": "2026-11-14-03",
+      "section": "llm",
+      "event_key": "Google Gemini 4 Carbon 일반 제공",
+      "title": "Gemini 4 Carbon 일반 제공, Antigravity /swarm 미리보기",
+      "card": [
+        "Google이 최상위 모델 Gemini 4 Carbon을 유료 개발자·기업, Ultra 구독자에게 열었다",
+        "API 가격은 Argon과 같은 도입가로, 입력 2달러·출력 10달러(100만 토큰당)",
+        "Antigravity에선 한 프롬프트로 에이전트 팀을 돌리는 /swarm을 미리 공개했다"
+      ],
+      "detail": "Carbon은 2주 전 Fairwind 프로그램을 통해 보안 방어 조직에 먼저 공개됐고, 이번에 범위를 넓혔다. 유료 개발자와 기업은 Google AI Studio API와 Gemini for business에서 쓸 수 있고, Google AI Ultra 구독자에게는 Antigravity, Gemini 앱, 검색 AI 모드로 제공이 시작됐다. Google은 Argon이 대부분의 개발·지식 작업에 맞고, Carbon은 토큰을 더 써서 복잡한 코딩·과학 연구를 맡는 모델이라고 구분했다. /swarm은 Carbon에 설계·조율·검토를 맡기고 가벼운 모델들을 병렬 작업 공간에 붙이는 방식이다. 강한 보안 능력을 고려해 오용 방지 장치를 보강했다고 밝혔다.",
+      "sources": [
+        {
+          "title": "Gemini 4 Carbon is now available",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/",
+          "published": "2026-11-11"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 1,
+        "note": "제공 대상을 유료 개발자·기업, Ultra 구독자로 한정"
+      }
+    },
+    {
+      "id": "2026-11-14-04",
+      "section": "llm",
+      "event_key": "Claude Managed Agents 자체 호스팅 출시",
+      "title": "Claude Managed Agents, 자체 인프라 설치 지원",
+      "card": [
+        "Claude Managed Agents 서비스 전체를 자기 인프라에서 돌릴 수 있게 됐다",
+        "에이전트·세션·세션 기록도 직접 보관하고, 모델 요청을 보낼 곳도 고른다",
+        "이용하려면 Anthropic 계정 담당 팀에 따로 요청해야 한다"
+      ],
+      "detail": "11월 12일 Claude 플랫폼 릴리스 노트 내용이다. 샌드박스만이 아니라 Managed Agents 서비스 전체를 사용자 인프라에서 운영하는 방식이 나왔다. 이 경우 에이전트 정의, 세션, 세션 이력이 모두 사용자 쪽에 남는다. 모델 호출을 어느 제공자로 보낼지도 고를 수 있고, 따로 정하지 않으면 Anthropic으로 간다. 쓰려면 Anthropic 계정 팀에 신청해야 한다.",
+      "sources": [
+        {
+          "title": "Claude Platform release notes",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "published": "2026-11-12"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 2,
+        "note": "직역된 상세 재구성, '이제까지 샌드박스만'을 '샌드박스만이 아니라'로"
+      }
+    },
+    {
+      "id": "2026-11-14-05",
+      "section": "llm",
+      "event_key": "OpenAI ChatGPT Wallet 공개",
+      "title": "OpenAI, 에이전트 결제용 ChatGPT Wallet 공개",
+      "card": [
+        "OpenAI가 에이전트가 대신 결제하도록 하는 ChatGPT Wallet을 발표했다",
+        "ChatGPT Work, Codex, dots의 에이전트가 사용자 승인을 받아 구매를 마친다",
+        "기존 카드 보호 장치가 적용된다고 설명한다"
+      ],
+      "detail": "OpenAI가 11월 14일(KST) ChatGPT Wallet을 소개했다. 공식 요약을 보면, 사용자가 승인하면 에이전트가 물건값을 치르고 구매를 마무리할 수 있다. 쓸 수 있는 곳은 ChatGPT Work, Codex, dots이고, 결제에는 이미 쓰던 카드의 보호 장치가 적용된다. 제공 국가, 대상 요금제, 지원 카드 종류는 이번에 확인한 범위에 없다. 기사 본문은 자동 요청이 막혀 읽지 못했고, 공식 요약만 확인했다.",
+      "sources": [
+        {
+          "title": "Introducing ChatGPT Wallet",
+          "url": "https://openai.com/index/introducing-chatgpt-wallet",
+          "published": "2026-11-14"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 3,
+        "note": "'결제마다' 삭제, '그대로' 삭제, 피드 설명 직역 문장 재구성(event_key '공개'로)"
+      }
+    }
+  ]
+}
