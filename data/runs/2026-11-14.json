@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-14",
+  "started_at": "2026-11-14T08:05:45+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 22,
+      "passed": 5,
+      "verification_edits": 13,
+      "skipped": [
+        {
+          "event_key": "Google Gemini Decisions API 공개",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/",
+          "reason": "권장 최대치(5) 안에서 중요도 낮음"
+        },
+        {
+          "event_key": "OpenAI Businesses in ChatGPT 출시",
+          "url": "https://openai.com/index/introducing-businesses-chatgpt",
+          "reason": "권장 최대치(5) 안에서 중요도 낮은 사업자용 기능"
+        },
+        {
+          "event_key": "ChatGPT Enterprise AWS Marketplace 제공",
+          "url": "https://openai.com/index/chatgpt-enterprise-aws-marketplace",
+          "reason": "구매 경로 추가로 중요도 낮음"
+        },
+        {
+          "event_key": "Gemini Intelligence 11월 기능·지원 기기 확대(Android)",
+          "url": "https://blog.google/products-and-platforms/platforms/android/gemini-intelligence-november-features-devices/",
+          "reason": "권장 최대치(5) 안에서 중요도 낮음"
+        },
+        {
+          "event_key": "Google Cloud Gemini for healthcare 출시",
+          "url": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/gemini-for-healthcare/",
+          "reason": "업종 특화 클라우드 제품으로 중요도 낮음"
+        },
+        {
+          "event_key": "Google·Adobe 도구 통합(Drive PDF 편집, Gemini 안 Adobe AI)",
+          "url": "https://blog.google/company-news/inside-google/company-announcements/adobe-google-partnership-integration/",
+          "reason": "제휴 통합 소식으로 중요도 낮음"
+        },
+        {
+          "event_key": "Google Labs Tabletop 실험 공개",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/google-labs/tabletop/",
+          "reason": "Labs 실험으로 중요도 낮음"
+        },
+        {
+          "event_key": "Gemini Robotics 2.5 공개",
+          "url": "https://deepmind.google/blog/gemini-robotics-2-5-accelerates-real-world-physical-intelligence/",
+          "reason": "로봇 연구 모델로 권장 최대치 안에서 우선순위 낮음"
+        },
+        {
+          "event_key": "DeepMind AlphaProof Code 공개",
+          "url": "https://deepmind.google/blog/introducing-alphaproof-code/",
+          "reason": "연구 성과 발표로 제품 변경 아님"
+        },
+        {
+          "event_key": "DeepMind AlphaGenome 2 공개",
+          "url": "https://deepmind.google/blog/alphagenome-2-deciphering-how-cells-read-dna-to-better-understand-disease/",
+          "reason": "과학 연구 모델로 제품 변경 아님"
+        },
+        {
+          "event_key": "DeepMind 날씨 모델 데이터셋 공개",
+          "url": "https://deepmind.google/blog/opening-the-datasets-behind-our-ai-weather-models/",
+          "reason": "데이터셋 공개로 올리지 않는 유형"
+        },
+        {
+          "event_key": "Codex CLI 0.168.0·0.169.0 배포(사이드 채팅 탭, 모델 제공자 관리 등)",
+          "url": "https://learn.chatgpt.com/docs/changelog",
+          "reason": "권장 최대치(5) 안에서 중요도 낮은 정기 CLI 릴리스"
+        },
+        {
+          "event_key": "OpenAI Control Room 연구 인프라 관리 시스템 소개",
+          "url": "https://openai.com/index/control-room",
+          "reason": "내부 인프라 소개로 제품 변경 아님"
+        },
+        {
+          "event_key": "OpenAI 아동 안전 연구 200만 달러 지원",
+          "url": "https://openai.com/index/children-first-declaration",
+          "reason": "연구 지원 소식으로 올리지 않는 유형"
+        },
+        {
+          "event_key": "OpenAI 퇴역군인 ChatGPT Plus 무료 제공 현황",
+          "url": "https://openai.com/index/chatgpt-plus-for-veterans",
+          "reason": "기존 프로그램 현황 글"
+        },
+        {
+          "event_key": "Anthropic IPO 로드쇼 시작",
+          "url": "https://www.anthropic.com/news",
+          "reason": "투자·상장 소식으로 올리지 않는 유형"
+        },
+        {
+          "event_key": "OpenAI 고객 사례·연구 글(Amplitude, Gondola, Holiday Extras, Gilbert+Tobin, JioStar, Singapore Airlines, Cogent, CodeRabbit, Kuken, 프리랜서 연구, 교육, 돌봄 워크숍)",
+          "url": "https://openai.com/news/",
+          "reason": "고객 사례·연구·행사 글로 올리지 않는 유형"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 4,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "TRILLION AGENT AI HACKATHON 2026(트릴리온랩스), 11월 6일 모집 마감",
+          "url": "https://cse.snu.ac.kr/ko/community/notice/25789",
+          "reason": "이미 마감"
+        },
+        {
+          "event_key": "DigiMan 일본 취업 연계 해커톤, 11월 11일 신청 마감",
+          "url": "https://linkareer.com/activity/360379",
+          "reason": "이미 마감, 재게시 사이트뿐"
+        },
+        {
+          "event_key": "Liner .EXE-THON 2026(40세 이상 AI 에이전트 해커톤), 11일 접수 마감",
+          "url": "https://www.digitaltoday.co.kr/cn/view/122473/liner-to-hold-ai-agent-hackathon-for-people-aged-40-and-older",
+          "reason": "이미 마감"
+        },
+        {
+          "event_key": "KT 에이블스쿨 10기 모집, 8월 10일 마감",
+          "url": "https://www.ddaily.co.kr/page/view/2026070709321967551",
+          "reason": "이미 마감, 최근 7일 소식 아님"
+        }
+      ]
+    }
+  },
+  "note": "수집 기간 11-07 08:06~11-14 08:05. Anthropic 뉴스 개별 기사(claude-fable-5-2 추정 주소) 404로 Fable 5.2는 릴리스 노트로만 확인. OpenAI 본문 403으로 ChatGPT Wallet은 RSS 요약만 사용. Gemini 릴리스 노트 기간 내 항목 없음. Anthropic 뉴스 목록 상단의 'November 13, 2026' 표기는 제목 없는 항목이라 확인 불가. 채용: 검색 7회, 최근 7일 안에 마감 전인 공고 없음."
+}
