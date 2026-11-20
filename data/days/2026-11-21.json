@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-21",
+  "headline": {
+    "item_id": "2026-11-21-01",
+    "text": "Google, Gemini 4 Neon 출시… Carbon과 Hydrogen 사이 빠르고 저렴한 모델"
+  },
+  "items": [
+    {
+      "id": "2026-11-21-01",
+      "section": "llm",
+      "event_key": "Google Gemini 4 Neon 출시",
+      "title": "Gemini 4 Neon 출시, Carbon·Hydrogen 사이 모델",
+      "card": [
+        "Google이 코딩·지식 업무·과학 작업용 Gemini 4 Neon을 공개했다",
+        "입력 100만 토큰당 3달러, 출력 15달러에 컨텍스트는 100만 토큰이다",
+        "Gemini API, 기업용 Gemini, Antigravity, Gemini 앱 유료 구독에 배포된다"
+      ],
+      "detail": "Google은 Neon을 Gemini 4 제품군의 중간 모델로 두고, 최상위 Carbon과 경량 Hydrogen 사이를 메운다고 설명했다. 캐시된 입력은 100만 토큰당 0.15달러다. 사고 수준은 네 단계이며, 기본값(high)에서 과제당 비용이 Carbon보다 32% 낮다고 밝혔다. Artificial Analysis Coding Agent Index에서 1위(58.6)라고 했다. Google Antigravity에서는 병렬 Hydrogen 서브에이전트를 지휘하는 오케스트레이터로도 쓸 수 있다. 개발자는 Google AI Studio의 Gemini API 유료 등급, 소비자는 Google AI Pro·Ultra 구독에서 쓸 수 있다. Gemini 앱의 Tasks도 Neon으로 돌릴 수 있게 됐다. 보안 업무용 Neon for cyber는 Fairwind Program 참여 방어 조직에 며칠 안에 순차 제공된다.",
+      "sources": [
+        {
+          "title": "Introducing Gemini 4 Neon",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+          "published": "2026-11-19"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 1,
+        "note": "제품군 위치 설명 문장을 원문 구조와 다르게 재작성"
+      }
+    },
+    {
+      "id": "2026-11-21-02",
+      "section": "llm",
+      "event_key": "OpenAI GPT-6.2 Astra·Sol 출시",
+      "title": "OpenAI GPT-6.2 Astra·Sol 출시",
+      "card": [
+        "OpenAI가 GPT-6.2 Astra와 Sol을 ChatGPT Work, Codex, API에 내놨다",
+        "고난도 작업용 Astra와 일상 업무용 Sol 두 갈래로 나뉜다",
+        "6.2 Sol은 같은 유료 요금제 안에서 쓸 수 있는 작업량이 6.1보다 늘었다"
+      ],
+      "detail": "OpenAI 피드 설명에 따르면 전문 결과물, 코딩, 컴퓨터 사용, 효율이 더 낮은 비용으로 나아졌다. Codex 변경 기록(11월 17일)은 두 모델이 ChatGPT Work와 Codex에서 쓸 수 있게 됐다고 적었다. Ultrafast 모드는 Pro 200달러 요금제에선 Sol만, 500달러 요금제에선 두 모델 모두 지원한다. 11월 20일 배포된 Codex CLI 0.171.0은 모델 목록에 두 모델을 넣고 Sol을 기본 선택으로 했다. OpenAI 발표 글 본문은 열지 못해(403) 공식 요약과 Codex 변경 기록만 확인했다.",
+      "sources": [
+        {
+          "title": "Introducing GPT-6.2 Astra and Sol",
+          "url": "https://openai.com/index/introducing-gpt-6-2-astra-sol",
+          "published": "2026-11-18"
+        },
+        {
+          "title": "Codex changelog",
+          "url": "https://learn.chatgpt.com/docs/changelog",
+          "published": "2026-11-17"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 4,
+        "note": "카드 2·3줄과 Ultrafast 문장의 직역 재작성, 비용 표현을 원문 수준으로 완화"
+      }
+    },
+    {
+      "id": "2026-11-21-03",
+      "section": "llm",
+      "event_key": "Tasks in Gemini 무료 제공(한국 포함 6개국)",
+      "title": "Tasks in Gemini 무료화, 한국 포함 6개국",
+      "card": [
+        "Gemini가 여러 단계 작업을 대신 처리하는 Tasks를 무료로 풀었다",
+        "미국·일본·한국·캐나다·호주·인도에서 Gemini 4 Hydrogen으로 돌아간다",
+        "결제, 문자, 이메일 전달로 맡기는 기능은 미국부터 시작한다"
+      ],
+      "detail": "Google 블로그(11월 17일, 미국 시각)에 따르면 이번 무료 제공은 수억 명을 대상으로 순차 적용된다. Gemini 앱에서 Chat을 Task로 바꿔 작업을 맡기며, 문자나 gemini@google.com 이메일 전달로 맡기는 방식은 미국에서만 된다. 미국부터 Google Pay 결제가 들어갔다. 사용자가 상한 금액을 정하면 Gemini가 결제 직전까지 준비하고, 승인이 있어야 구매를 마친다. Google Messages·iMessage 문자로 작업을 맡기고 도중에 지시를 바꿀 수 있다. 작업은 계정 전용 하드웨어 격리 가상 머신에서 실행된다고 Google은 설명했다. 연결 앱은 60개가 넘는다.",
+      "sources": [
+        {
+          "title": "Put Gemini to work for you",
+          "url": "https://blog.google/innovation-and-ai/products/gemini-app/tasks-in-gemini-free-new-features/",
+          "published": "2026-11-18"
+        },
+        {
+          "title": "Gemini Apps release notes",
+          "url": "https://gemini.google/release-notes/",
+          "published": "2026-11-17"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 1,
+        "note": "문자·이메일 전달이 미국 한정임을 명시"
+      }
+    },
+    {
+      "id": "2026-11-21-04",
+      "section": "llm",
+      "event_key": "Claude API Linked billing 베타 출시",
+      "title": "Claude API, 고객 조직이 비용 내는 Linked billing 베타",
+      "card": [
+        "앱 개발자가 내던 Claude 사용료를 고객 조직이 직접 부담하는 방식이 생겼다",
+        "개발자는 요청 단위로 비용 부담 주체를 지정한다",
+        "고객 쪽에서도 앱별 지출 한도 설정과 연결 해제가 가능하다"
+      ],
+      "detail": "Claude 플랫폼 릴리스 노트(11월 17일)에 따르면 이 베타는 user-profiles-billing-2026-10-01 헤더로 켠다. 지정은 /v1/messages와 /v1/chat/completions 요청의 billing_policy 값으로 한다. 고객은 Claude Console에서 해당 앱의 지출을 제한하거나 연동을 해제할 수 있다. 대상은 Anthropic과 API 사용료를 직접 정산하는 조직의 고객으로 한정된다.",
+      "sources": [
+        {
+          "title": "Claude Platform release notes",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "published": "2026-11-17"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 4,
+        "note": "원문 문장을 옮긴 카드 3줄과 상세를 다시 쓰고 중복 제거"
+      }
+    },
+    {
+      "id": "2026-11-21-05",
+      "section": "llm",
+      "event_key": "Gemini API Tool Retrieval 프리뷰",
+      "title": "Gemini API, 도구 스키마를 필요할 때 불러오는 Tool Retrieval",
+      "card": [
+        "Gemini Interactions API에 Tool Retrieval이 프리뷰로 들어왔다",
+        "도구 이름·설명만 두고 매개변수 스키마는 필요할 때 불러온다",
+        "도구가 많은 에이전트의 입력 토큰과 지연을 줄이려는 기능이다"
+      ],
+      "detail": "설정은 tool_search 도구를 추가하고 뒤로 미룰 도구에 defer_loading 플래그를 다는 것으로 끝나며, 검색부터 스키마 로드, 함수 호출까지 한 번의 API 호출 안에서 처리된다. 원격 MCP 서버에도 적용할 수 있다. 자체 도구 저장소를 쓰려면 검색을 클라이언트 쪽에서 실행하도록 설정할 수 있으며, 이때 검색마다 왕복이 한 번 더 생긴다. 별도 요금은 없지만 tool_search를 켜면 고정 입력 토큰이 조금 붙고, 불러온 스키마는 이후 대화 동안 입력 토큰으로 과금된다. Interactions API에서 Gemini 3.6 이후 모델(Gemini 4는 모든 모델)에 쓸 수 있다.",
+      "sources": [
+        {
+          "title": "Introducing Tool Retrieval in the Gemini API",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-api-tool-retrieval/",
+          "published": "2026-11-20"
+        }
+      ],
+      "verification": {
+        "status": "fixed",
+        "edits": 3,
+        "note": "설정 설명 재작성, 지원 모델 표현 모호성 해소, tool_search 고정 토큰 추가"
+      }
+    }
+  ]
+}
