@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-28",
+  "started_at": "2026-11-28T08:05:56+09:00",
+  "status": "published",
+  "sections": {
+    "llm": {
+      "candidates": 12,
+      "passed": 4,
+      "verification_edits": 11,
+      "skipped": [
+        {
+          "event_key": "GPT-6 모델 단백질 설계 능력 연구",
+          "url": "https://openai.com/index/gpt-6-models-demonstrate-intrinsic-protein-design-capabilities",
+          "reason": "연구 글로 제품 변경 아님"
+        },
+        {
+          "event_key": "OpenAI 고객 사례·행사 글(Astra 외계행성 탐색, Intentful, iFood, Clay, Richpanel, 사내 법무 웨비나)",
+          "url": "https://openai.com/news/",
+          "reason": "고객 사례·행사 글로 올리지 않는 유형"
+        },
+        {
+          "event_key": "OpenAI Perplexity and Intelligence(평가 방법 글)",
+          "url": "https://openai.com/index/perplexity-and-intelligence",
+          "reason": "설명·연구 글로 제품 변경 아님"
+        },
+        {
+          "event_key": "Google Gemini·Golden State 제휴",
+          "url": "https://blog.google/products-and-platforms/products/gemini/gemini-golden-state/",
+          "reason": "제휴·고객 사례"
+        },
+        {
+          "event_key": "DeepMind Mass Spec Skills for Google Antigravity",
+          "url": "https://deepmind.google/blog/interpreting-mass-spectra-with-google-antigravity/",
+          "reason": "과학 연구용 스킬로 우선순위 낮음"
+        },
+        {
+          "event_key": "DeepMind 에이전트·형식 검증으로 양자 알고리즘 개선",
+          "url": "https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/",
+          "reason": "연구 글로 제품 변경 아님"
+        },
+        {
+          "event_key": "Codex CLI 0.172.0 및 Codex app 26.1120",
+          "url": "https://learn.chatgpt.com/docs/changelog",
+          "reason": "정기 릴리스로 중요도 낮음"
+        },
+        {
+          "event_key": "Claude Enterprise Analytics API 집계 누락 수정(웹 검색·커넥터·프로젝트)",
+          "url": "https://platform.claude.com/docs/en/release-notes/overview",
+          "reason": "집계 버그 수정으로 중요도 낮음"
+        }
+      ]
+    },
+    "hiring": {
+      "candidates": 5,
+      "passed": 0,
+      "verification_edits": 0,
+      "skipped": [
+        {
+          "event_key": "서울시 청년취업사관학교 AI⁺ Academy(KT·Salesforce·Intel) 모집, 12월 6일 마감",
+          "url": "https://cse.snu.ac.kr/en/community/notice/25833",
+          "reason": "원문 확인 불가(공식 사이트 aisesac.seoul.kr 403, 서울미디어허브 기사 연결 끊김), 최근 7일 기사 아님"
+        },
+        {
+          "event_key": "동그라미재단 AI 아카데미 10기, 11월 25일 마감",
+          "url": "https://superookie.com/seminars/6afcf4c71568a570ad6fbe22",
+          "reason": "이미 마감, 재게시 사이트"
+        },
+        {
+          "event_key": "넥슨 넥토리얼 코딩테스트 폐지·AI 활용 역량평가 등 기업 채용 동향",
+          "url": "https://byline.network/2026/09/17-592/",
+          "reason": "최근 7일 기사 아님(9~10월 보도)"
+        },
+        {
+          "event_key": "SK하이닉스 LLM 활용 면접 과제",
+          "url": "https://www.koreadaily.com/article/20261109140830933",
+          "reason": "최근 7일 기사 아님(11월 9일)"
+        },
+        {
+          "event_key": "산업기술기획평가원 AI 라이프 솔루션 챌린지(~12/2)",
+          "url": "https://cse.snu.ac.kr/ko/community/notice/24477",
+          "reason": "연도 불명확한 과거 공지, 서울대 공지 연결 끊김으로 확인 불가"
+        }
+      ]
+    }
+  },
+  "note": "OpenAI 기사 본문 403(알려진 문제), Shirudo는 피드 요약만 확인. Gemini 릴리스 노트·Anthropic 뉴스에 기간 안 새 항목 없음. aisesac.seoul.kr 403, mediahub.seoul.go.kr URLError. 날짜만 있는 출처(Claude 릴리스 노트)의 published KST 환산 규칙이 runbook에 없어 원문 날짜 그대로 씀 — 규칙 명시 검토 필요."
+}
